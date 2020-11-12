@@ -14,13 +14,12 @@ public class Configuration {
     private static File file;
     private static FileConfiguration customFile;
 
-    private static final int CURRENT_CONFIG_VERSION = 3;
+    private static final int CURRENT_CONFIG_VERSION = 5;
 
     /*
      ** Finds or generates the custom config file
      */
-    public static void setup(){
-        Easyconomy plugin = Easyconomy.getInstance();
+    public static void setup(Easyconomy plugin){
         plugin.getLogger().log(Level.INFO, "Loading Configuration");
 
         file = new File(plugin.getDataFolder(), "config.yml");

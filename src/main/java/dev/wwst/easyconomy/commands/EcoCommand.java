@@ -1,6 +1,5 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.Configuration;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
@@ -16,10 +15,12 @@ public class EcoCommand implements CommandExecutor {
 
     private final Economy eco;
     private final MessageTranslator msg;
+    private final String version;
 
-    public EcoCommand() {
-        eco = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
-        msg = MessageTranslator.getInstance();
+    public EcoCommand(Economy economy, MessageTranslator translator, String ver) {
+        this.eco = economy;
+        this.msg = translator;
+        this.version = ver;
     }
 
     @Override
@@ -27,7 +28,8 @@ public class EcoCommand implements CommandExecutor {
         label = label.toLowerCase();
         if(label.equals("eco") && args.length == 0) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    "&aEasyConomy by Weiiswurst#0016 Version "+ Easyconomy.getInstance().getDescription().getVersion()));
+                    "&aEasyConomy by Weiiswurst#0016, forked by Geolykt."
+                    + " Version "+ version));
             return true;
         } else {
             String permission = Configuration.get().getString("permissions.modify","");
@@ -58,6 +60,7 @@ public class EcoCommand implements CommandExecutor {
     }
 
     private boolean performOperation(CommandSender sender, String operation, String target, String amountStr) {
+        @SuppressWarnings("deprecation")
         final OfflinePlayer p = Bukkit.getOfflinePlayer(target);
         if(!p.isOnline() && !p.hasPlayedBefore()) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,target));

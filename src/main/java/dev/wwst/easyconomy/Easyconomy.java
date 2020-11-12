@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Weiiswurst
@@ -27,7 +28,8 @@ public final class Easyconomy extends JavaPlugin {
 
     private static Easyconomy INSTANCE;
 
-    private EasyConomyProvider ecp = null;
+    private EasyConomyProvider ecp;
+    private MessageTranslator translator;
 
     public static final String PLUGIN_NAME = "EasyConomy";
 
@@ -35,8 +37,8 @@ public final class Easyconomy extends JavaPlugin {
     public void onEnable() {
         INSTANCE = this;
         getDataFolder().mkdirs();
-        Configuration.setup();
-        new MessageTranslator(Configuration.get().getString("language"));
+        Configuration.setup(this);
+        translator = new MessageTranslator(Configuration.get().getString("language"), this);
 
         PluginManager pm = Bukkit.getPluginManager();
 
@@ -48,7 +50,7 @@ public final class Easyconomy extends JavaPlugin {
         }
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if(rsp == null) {
-            ecp = new EasyConomyProvider();
+            ecp = new EasyConomyProvider(Configuration.get());
             Bukkit.getServicesManager().register(Economy.class, ecp,this, ServicePriority.Normal);
         } else {
             getLogger().severe("!!! YOU ALREADY HAVE AN ECONOMY PLUGIN !!!");
@@ -57,24 +59,12 @@ public final class Easyconomy extends JavaPlugin {
             return;
         }
 
-        getCommand("balance").setExecutor(new BalanceCommand());
-        getCommand("eco").setExecutor(new EcoCommand());
-        getCommand("pay").setExecutor(new PayCommand());
-        getCommand("baltop").setExecutor(new BaltopCommand());
+        getCommand("balance").setExecutor(new BalanceCommand(ecp, translator));
+        getCommand("eco").setExecutor(new EcoCommand(ecp, translator, getDescription().getVersion()));
+        getCommand("pay").setExecutor(new PayCommand(ecp, translator));
+        getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
-        pm.registerEvents(new JoinEvent(ecp.getStorage()),this);
-
-        Metrics metrics = new Metrics(this, 7962);
-
-        if(Configuration.get().getBoolean("update-checker")) {
-            new UpdateChecker(this, 81034).getVersion(version -> {
-                if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
-                    getLogger().info("You are up to date!");
-                } else {
-                    getLogger().warning("!!! There is a new update available! Download at https://www.spigotmc.org/resources/easyconomy.81034/ !!!");
-                }
-            });
-        }
+        pm.registerEvents(new JoinEvent(ecp, this),this);
     }
 
     @Override
@@ -90,8 +80,8 @@ public final class Easyconomy extends JavaPlugin {
         return "plugins//EasyConomy";
     }
 
-    public static Easyconomy getInstance() {
-        return INSTANCE;
+    public static Logger getPluginLogger() {
+        return INSTANCE.getLogger();
     }
 
     public void addDataStorage(PlayerDataStorage pds) {

@@ -26,15 +26,11 @@ public class EasyConomyProvider implements Economy {
     private final String currencyFormatSingular,
             currencyFormatPlural;
 
-    public EasyConomyProvider() {
-        FileConfiguration config = Configuration.get();
-        if(config.getBoolean("use-binary", false))
-            pds = new BinaryDataStorage(config.getString("storage-location", "balances.dat"), config.getInt("baltopPlayers"));
-        else
-            pds = new YamlDataStorage(config.getString("storage-location", "balances.yml"), config.getInt("baltopPlayers"));
+    public EasyConomyProvider(FileConfiguration config) {
+        pds = new BinaryDataStorage(config.getString("storage-location", "balances.dat"), config.getInt("baltopPlayers"));
 
         if(Configuration.get().getBoolean("enable-logging",true))
-            logger = Easyconomy.getInstance().getLogger();
+            logger = Easyconomy.getPluginLogger();
         else
             logger = null;
 

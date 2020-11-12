@@ -7,8 +7,6 @@ prefix: "&3EasyConomy &8| &7"
 
 enable-logging: true
 
-update-checker: true
-
 permissions:
   README: >
     IF YOU WANT THE PLUGIN TO USE PERMISSIONS,
@@ -23,11 +21,6 @@ permissions:
 
 startingBalance: 0
 
-# True if the binary mode should be used for storage.
-# Binary mode provides lower filesize (24 bytes per player) than the normal mode (45 bytes per player or more)
-# as well as faster saving (~1500ms rather than ~9000ms per million players) and loading (~1300ms rather than ~8500ms per million players) speeds.
-# A downside is that it's harder to repair damage to the file as well as editing things. USE BACKUPS!
-use-binary: false
 storage-location: "balances.yml"
 
 minimumTransactionAmount: 0.1

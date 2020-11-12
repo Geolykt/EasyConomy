@@ -1,6 +1,6 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.EasyConomyProvider;
 import dev.wwst.easyconomy.storage.PlayerDataStorage;
 import dev.wwst.easyconomy.utils.Configuration;
 import dev.wwst.easyconomy.utils.MessageTranslator;
@@ -19,10 +19,10 @@ public class BaltopCommand implements CommandExecutor {
     private final PlayerDataStorage pds;
     private final Economy eco;
 
-    public BaltopCommand() {
-        msg = MessageTranslator.getInstance();
-        pds = Easyconomy.getInstance().getEcp().getStorage();
-        eco = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
+    public BaltopCommand(EasyConomyProvider economy, MessageTranslator translator) {
+        msg = translator;
+        eco = economy;
+        pds = economy.getStorage();
     }
 
     @Override

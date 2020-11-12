@@ -19,34 +19,26 @@ public class MessageTranslator {
             "en"
     };
 
-    private static MessageTranslator INSTANCE;
-
-    private Easyconomy plugin;
-    private String language;
-    private String prefix;
-    private YamlConfiguration cfg;
+    private final Easyconomy plugin;
+    private final String language;
+    private final String prefix;
+    private final YamlConfiguration cfg;
 
 
     private HashMap<String, String> messages;
 
-    public MessageTranslator(String language) {
-        if(INSTANCE != null) {
-            return;
-        }
-        INSTANCE = this;
-        plugin = Easyconomy.getInstance();
+    public MessageTranslator(String language, Easyconomy invokingPlugin) {
+        this.plugin = invokingPlugin;
         prefix = Configuration.get().getString("prefix");
         messages = new HashMap<>();
         this.language = language;
 
         saveDefaults();
 
-        // System.out.println(plugin.getConfigFolderPath()); // Ancient Debug Line
-
         File languageFile = new File("plugins/EasyConomy/messages_"+language+".yml");
         if(!languageFile.exists()) {
             plugin.getLogger().log(Level.SEVERE, "!!! The language chosen by you, "+language+", cannot be resolved!");
-            plugin.getLogger().log(Level.SEVERE, "!!! Create a file called messages_"+language+".yml in the AdminTools folder to start!");
+            plugin.getLogger().log(Level.SEVERE, "!!! Create a file called messages_"+language+".yml in the EasyConomy folder to start!");
             plugin.getLogger().log(Level.SEVERE, "!!! For now, the ENGLISH language file will be loaded!");
             languageFile =new File("plugins/EasyConomy/messages_en.yml");
             System.out.println(languageFile.exists());
@@ -90,7 +82,7 @@ public class MessageTranslator {
         String message = messages.get(key);
         for(int i = 0; message.contains("%s") && replacements != null; i++) {
             if(replacements.length <= i) {
-                message = message.replaceFirst("%s", "&cNO REPLACEMENT");
+                message = message.replaceFirst("%s", "&cN/A");
             } else {
                 message = message.replaceFirst("%s", replacements[i]);
             }
@@ -103,11 +95,11 @@ public class MessageTranslator {
     }
 
     public String getMessage(String key, boolean addPrefix) {
-        return getMessageAndReplace(key,addPrefix, null,"");
+        return getMessageAndReplace(key, addPrefix, null, "");
     }
 
     public String getMessage(String key) {
-        return getMessageAndReplace(key,false,null,"");
+        return getMessageAndReplace(key, false, null, "");
     }
 
     public YamlConfiguration getConfiguration() {
@@ -116,9 +108,5 @@ public class MessageTranslator {
 
     public String getLanguage() {
         return language;
-    }
-
-    public static MessageTranslator getInstance() {
-        return INSTANCE;
     }
 }

@@ -18,9 +18,9 @@ public class PayCommand implements CommandExecutor {
 
     private final double minimumTransactionAmount;
 
-    public PayCommand() {
-        eco = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
-        msg = MessageTranslator.getInstance();
+    public PayCommand(Economy economy, MessageTranslator translator) {
+        eco = economy;
+        msg = translator;
         minimumTransactionAmount = Configuration.get().getDouble("minimumTransactionAmount",0.1d);
     }
 
@@ -60,6 +60,7 @@ public class PayCommand implements CommandExecutor {
             sender.sendMessage(msg.getMessageAndReplace("general.insufficientFunds",true,eco.format(amount-eco.getBalance(p))));
             return true;
         }
+        @SuppressWarnings("deprecation")
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
         if(!eco.hasAccount(target)) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,args[0]));

@@ -10,15 +10,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("deprecation")
 public class BalanceCommand implements CommandExecutor {
 
     private final Economy eco;
     private final MessageTranslator msg;
 
-    public BalanceCommand() {
-        eco = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
-        msg = MessageTranslator.getInstance();
+    public BalanceCommand(Economy economy, MessageTranslator translator) {
+        eco = economy;
+        msg = translator;
     }
 
     @Override
@@ -32,15 +31,15 @@ public class BalanceCommand implements CommandExecutor {
             return true;
         }
 
-        String permission = Configuration.get().getString("permissions.balance","");
+        String permission = Configuration.get().getString("permissions.balance", "");
         if(!"".equals(permission) && !sender.hasPermission(permission)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.noPerms",true,permission));
+            sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permission));
             return true;
         }
 
         Player p = (Player) sender;
         if(args.length == 0) {
-            p.sendMessage(msg.getMessageAndReplace("balance.ofSelf",true,eco.format(eco.getBalance(p))));
+            p.sendMessage(msg.getMessageAndReplace("balance.ofSelf", true, eco.format(eco.getBalance(p))));
         } else if(args.length == 1) {
             String otherBalancePerm = Configuration.get().getString("permissions.othersBalance","");
             if(!"".equals(otherBalancePerm) && !sender.hasPermission(otherBalancePerm)) {
@@ -55,6 +54,7 @@ public class BalanceCommand implements CommandExecutor {
     }
 
     private void sendBalanceOfOther(CommandSender sender, String otherName) {
+        @SuppressWarnings("deprecation")
         OfflinePlayer p = Bukkit.getOfflinePlayer(otherName);
         if(!p.hasPlayedBefore() || !eco.hasAccount(p)) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,otherName));
