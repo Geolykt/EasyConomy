@@ -9,6 +9,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -20,14 +22,16 @@ import java.util.logging.Logger;
  */
 public class EasyConomyProvider implements Economy {
 
-    private final PlayerDataStorage pds;
+    private final PlayerDataStorage playerPDS;
+    private final BinaryAccountStoarge bankPDS;
     private final Logger logger;
 
     private final String currencyFormatSingular,
             currencyFormatPlural;
 
-    public EasyConomyProvider(FileConfiguration config) {
-        pds = new BinaryDataStorage(config.getString("storage-location", "balances.dat"), config.getInt("baltopPlayers"));
+    public EasyConomyProvider(FileConfiguration config, Easyconomy invokingPlugin) throws IOException {
+        playerPDS = new BinaryDataStorage(config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
+        bankPDS = new BinaryAccountStoarge(new File(config.getString("storage-location-bank", "banks.dat")), invokingPlugin);
 
         if(Configuration.get().getBoolean("enable-logging",true))
             logger = Easyconomy.getPluginLogger();
@@ -39,7 +43,7 @@ public class EasyConomyProvider implements Economy {
     }
 
     public PlayerDataStorage getStorage() {
-        return pds;
+        return playerPDS;
     }
 
     /**
@@ -142,8 +146,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        //logger.info(pds.getConfig().isSet(player.getUniqueId().toString())+"");
-        return true;
+        return playerPDS.has(player.getUniqueId());
     }
 
     /**
@@ -187,7 +190,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public double getBalance(OfflinePlayer player) {
-        return pds.getPlayerData(player);
+        return playerPDS.getPlayerData(player);
     }
 
     /**
@@ -285,7 +288,7 @@ public class EasyConomyProvider implements Economy {
         final double newBalance = BigDecimal.valueOf(oldBalance).subtract(BigDecimal.valueOf(amount)).doubleValue();
         if(logger != null)
             logger.info("[TRANSFER] "+player.getUniqueId()+" "+format(-amount));
-        pds.write(player.getUniqueId(), newBalance);
+        playerPDS.write(player.getUniqueId(), newBalance);
         //logger.info("New bal"+getBalance(player)+" old bal "+oldBalance);
         return new EconomyResponse(Math.abs(amount),newBalance,EconomyResponse.ResponseType.SUCCESS,"");
     }

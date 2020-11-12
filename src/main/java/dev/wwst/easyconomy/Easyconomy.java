@@ -5,7 +5,7 @@ import dev.wwst.easyconomy.commands.BaltopCommand;
 import dev.wwst.easyconomy.commands.EcoCommand;
 import dev.wwst.easyconomy.commands.PayCommand;
 import dev.wwst.easyconomy.events.JoinEvent;
-import dev.wwst.easyconomy.storage.PlayerDataStorage;
+import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -14,6 +14,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
  */
 public final class Easyconomy extends JavaPlugin {
 
-    private final List<PlayerDataStorage> toSave = new ArrayList<>();
+    private final List<Saveable> toSave = new ArrayList<>();
 
     private static Easyconomy INSTANCE;
 
@@ -50,7 +51,14 @@ public final class Easyconomy extends JavaPlugin {
         }
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if(rsp == null) {
-            ecp = new EasyConomyProvider(Configuration.get());
+            try {
+                ecp = new EasyConomyProvider(Configuration.get(), this);
+            } catch (IOException e) {
+                e.printStackTrace();
+                getLogger().severe("!!! Failed important FIO Operation !!!");
+                pm.disablePlugin(this);
+                return;
+            }
             Bukkit.getServicesManager().register(Economy.class, ecp,this, ServicePriority.Normal);
         } else {
             getLogger().severe("!!! YOU ALREADY HAVE AN ECONOMY PLUGIN !!!");
@@ -69,8 +77,12 @@ public final class Easyconomy extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for(PlayerDataStorage pds : toSave) {
-            pds.save();
+        for(Saveable saveable : toSave) {
+            try {
+                saveable.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         getLogger().log(Level.INFO, "EasyConomy was disabled.");
     }
@@ -84,8 +96,8 @@ public final class Easyconomy extends JavaPlugin {
         return INSTANCE.getLogger();
     }
 
-    public void addDataStorage(PlayerDataStorage pds) {
-        toSave.add(pds);
+    public void addSaveable(Saveable saveable) {
+        toSave.add(saveable);
     }
 
     public EasyConomyProvider getEcp() {

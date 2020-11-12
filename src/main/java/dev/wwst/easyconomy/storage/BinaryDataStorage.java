@@ -55,7 +55,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
             }
         }
         reload();
-        plugin.addDataStorage(this);
+        plugin.addSaveable(this);
 
         if (baltopLength > 0) {
             plugin.getLogger().info(
@@ -101,8 +101,8 @@ public class BinaryDataStorage implements PlayerDataStorage {
             fileOut.write(1);
             for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
                 fileOut.write(ByteBuffer.allocate(24)
-                        .putLong(entry.getKey().getLeastSignificantBits())
                         .putLong(entry.getKey().getMostSignificantBits())
+                        .putLong(entry.getKey().getLeastSignificantBits())
                         .putDouble(entry.getValue())
                         .array());
             }

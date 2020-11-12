@@ -9,18 +9,13 @@ import org.bukkit.OfflinePlayer;
 /**
  * @author Weiiswurst
  */
-public interface PlayerDataStorage {
+public interface PlayerDataStorage extends Saveable {
 
     public double getPlayerData(OfflinePlayer p);
 
     public double getPlayerData(UUID player);
 
     public List<UUID> getAllData();
-
-    /*
-     ** Saves the current FileConfiguration to the file on the disk
-     */
-    public void save();
 
     public void write(UUID key, double value);
 
