@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -139,7 +138,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean hasAccount(String playerName) {
-        return hasAccount(Bukkit.getOfflinePlayer(playerName));
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            return bankPDS.getAccount(playerName) != null;
+        } else {
+            return hasAccount(player);
+        }
     }
 
     /**
@@ -162,7 +166,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean hasAccount(String playerName, String worldName) {
-        return hasAccount(Bukkit.getOfflinePlayer(playerName),worldName);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            return bankPDS.getAccount(playerName) != null;
+        } else {
+            return hasAccount(player);
+        }
     }
 
     /**
@@ -185,7 +194,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public double getBalance(String playerName) {
-        return getBalance(Bukkit.getOfflinePlayer(playerName));
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            return bankPDS.getMoney(playerName);
+        } else {
+            return getBalance(player);
+        }
     }
 
     /**
@@ -252,7 +266,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean has(String playerName, String worldName, double amount) {
-        return has(playerName,amount);
+        return getBalance(playerName) >= amount;
     }
 
     /**
@@ -266,7 +280,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean has(OfflinePlayer player, String worldName, double amount) {
-        return has(player,amount);
+        return getBalance(player) >= amount;
     }
 
     /**
@@ -276,7 +290,17 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        return withdrawPlayer(Bukkit.getOfflinePlayer(playerName),amount);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            Account account = bankPDS.getAccount(playerName);
+            if (account == null) {
+                return new EconomyResponse(0, 0, ResponseType.FAILURE, playerName + " is not a player or bank!");
+            }
+            account.removeMoney(amount);
+            return new EconomyResponse(amount, account.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return withdrawPlayer(player, amount);
+        }
     }
 
     /**
@@ -296,7 +320,7 @@ public class EasyConomyProvider implements Economy {
             logger.info("[TRANSFER] "+player.getUniqueId()+" "+format(-amount));
         playerPDS.write(player.getUniqueId(), newBalance);
         //logger.info("New bal"+getBalance(player)+" old bal "+oldBalance);
-        return new EconomyResponse(Math.abs(amount),newBalance,EconomyResponse.ResponseType.SUCCESS,"");
+        return new EconomyResponse(amount, newBalance, EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -307,7 +331,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
-        return withdrawPlayer(Bukkit.getOfflinePlayer(playerName),worldName,amount);
+        return withdrawPlayer(playerName, amount);
     }
 
     /**
@@ -321,7 +345,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double amount) {
-        return withdrawPlayer(player,amount);
+        return withdrawPlayer(player, amount);
     }
 
     /**
@@ -331,7 +355,17 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
-        return withdrawPlayer(playerName,-amount);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            Account account = bankPDS.getAccount(playerName);
+            if (account == null) {
+                return new EconomyResponse(0, 0, ResponseType.FAILURE, playerName + " is not a player or bank!");
+            }
+            account.addMoney(amount);
+            return new EconomyResponse(amount, account.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
+        } else {
+            return depositPlayer(player, amount);
+        }
     }
 
     /**
@@ -354,7 +388,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
-        return withdrawPlayer(playerName,worldName,-amount);
+        return depositPlayer(playerName, amount);
     }
 
     /**
@@ -368,7 +402,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double amount) {
-        return withdrawPlayer(player,worldName,-amount);
+        return depositPlayer(player, amount);
     }
 
     /**
@@ -580,7 +614,17 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean createPlayerAccount(String playerName) {
-        return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            if (bankPDS.isAccountExisting(playerName)) {
+                return false;
+            } else {
+                bankPDS.addAccount(new Account(playerName, 0, new HashSet<UUID>()));
+                return true;
+            }
+        } else {
+            return createPlayerAccount(player);
+        }
     }
 
     /**
@@ -606,7 +650,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean createPlayerAccount(String playerName, String worldName) {
-        return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
+        return createPlayerAccount(playerName);
     }
 
     /**

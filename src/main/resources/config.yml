@@ -21,7 +21,10 @@ permissions:
 
 startingBalance: 0
 
-storage-location: "balances.yml"
+# The place where player balances are stored
+storage-location-player: "balances.dat"
+# The place where banks are stored, these may be used by other plugins.
+storage-location-bank: "banks.dat"
 
 minimumTransactionAmount: 0.1
 # All decimals shown

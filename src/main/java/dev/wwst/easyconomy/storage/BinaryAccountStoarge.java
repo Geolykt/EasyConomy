@@ -10,14 +10,18 @@ import java.util.Set;
 
 import dev.wwst.easyconomy.Easyconomy;
 
+/**
+ * Binary adapters for Bank storage.
+ * @author Geolykt
+ */
 public class BinaryAccountStoarge implements Saveable {
 
-    private final File location;
+    private final File storageLoc;
     private final HashMap<String, Account> accounts = new HashMap<>();
 
     public BinaryAccountStoarge(File file, Easyconomy plugin) throws IOException {
         file.createNewFile();
-        this.location = file;
+        this.storageLoc = file;
         reload();
         plugin.addSaveable(this);
     }
@@ -45,7 +49,7 @@ public class BinaryAccountStoarge implements Saveable {
 
     @Override
     public void save() throws IOException {
-        try (FileOutputStream ioStream = new FileOutputStream(location)) {
+        try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
             for (Map.Entry<String, Account> acc : accounts.entrySet()) {
                 acc.getValue().serialize(ioStream);
             }
@@ -53,7 +57,7 @@ public class BinaryAccountStoarge implements Saveable {
     }
 
     public void reload() throws IOException {
-        try (FileInputStream ioStream = new FileInputStream(location)) {
+        try (FileInputStream ioStream = new FileInputStream(storageLoc)) {
             accounts.clear();
             while (true) {
                 Account acc = Account.deserialize(ioStream);
@@ -69,11 +73,27 @@ public class BinaryAccountStoarge implements Saveable {
         return accounts.keySet();
     }
 
+    /**
+     * Returns the amount of money a given bank has, or 0.0 if the bank does not exist. Does not throw NullPointers.
+     * @param name The bank of the name
+     * @return The amount of money within a given bank.
+     */
     public double getMoney(String name) {
         return isAccountExisting(name) ? getAccount(name).getMoney() : 0.0;
     }
 
     public Account removeAccount(String name) {
         return accounts.remove(name);
+    }
+
+    /**
+     * Returns the amount of money a given bank has, or defaultValue if the bank does not exist. 
+     *  Does not throw NullPointers.
+     * @param name The bank of the name
+     * @param defaultValue The default value to return
+     * @return The amount of money within a given bank.
+     */
+    public double getBalanceOrDefault(String name, double defaultValue) {
+        return isAccountExisting(name) ? getAccount(name).getMoney() : defaultValue;
     }
 }
