@@ -4,6 +4,8 @@ import dev.wwst.easyconomy.storage.*;
 import dev.wwst.easyconomy.utils.Configuration;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -14,7 +16,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -73,7 +79,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean hasBankSupport() {
-        return false;
+        return true;
     }
 
     /**
@@ -372,7 +378,17 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse createBank(String name, String player) {
-        return new EconomyResponse(0,getBalance(player), EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        if (bankPDS.isAccountExisting(name)) {
+            return new EconomyResponse(0, bankPDS.getMoney(name),
+                    EconomyResponse.ResponseType.FAILURE, "Bank already exists.");
+        }
+        Set<UUID> uuids = new HashSet<UUID>();
+        OfflinePlayer plyr = Bukkit.getOfflinePlayer(player);
+        if (plyr != null) {
+            uuids.add(plyr.getUniqueId());
+        }
+        bankPDS.addAccount(new Account(name, 0, uuids));
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -384,7 +400,14 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse createBank(String name, OfflinePlayer player) {
-        return new EconomyResponse(0,getBalance(player), EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        if (bankPDS.isAccountExisting(name)) {
+            return new EconomyResponse(0, bankPDS.getMoney(name),
+                    EconomyResponse.ResponseType.FAILURE, "Bank already exists.");
+        }
+        Set<UUID> uuids = new HashSet<UUID>();
+        uuids.add(player.getUniqueId());
+        bankPDS.addAccount(new Account(name, 0, uuids));
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -395,7 +418,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse deleteBank(String name) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.removeAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        return new EconomyResponse(bank.getMoney(), 0, EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -406,7 +434,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse bankBalance(String name) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        return new EconomyResponse(0, bank.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -418,7 +451,17 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse bankHas(String name, double amount) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        // TODO what should the method really do?
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        if (bank.getMoney() < amount) {
+            return new EconomyResponse(0, bank.getMoney(), EconomyResponse.ResponseType.FAILURE, null);
+        } else {
+            return new EconomyResponse(0, bank.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
+        }
     }
 
     /**
@@ -430,7 +473,15 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse bankWithdraw(String name, double amount) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        if(logger != null)
+            logger.info("[BANK-TRANSFER] "+ name +" "+format(-amount));
+        bank.removeMoney(amount);
+        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.FAILURE, null);
     }
 
     /**
@@ -442,7 +493,15 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse bankDeposit(String name, double amount) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        if(logger != null)
+            logger.info("[BANK-TRANSFER] "+ name +" "+format(amount));
+        bank.addMoney(amount);
+        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.FAILURE, null);
     }
 
     /**
@@ -452,7 +511,15 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        return new EconomyResponse(0, 
+                bank.getMoney(),
+                bank.isMember(playerName) ? ResponseType.SUCCESS : ResponseType.FAILURE,
+                 null);
     }
 
     /**
@@ -464,7 +531,15 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse isBankOwner(String name, OfflinePlayer player) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        Account bank = bankPDS.getAccount(name);
+        if (bank == null) {
+            return new EconomyResponse(0, 0,
+                    EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
+        }
+        return new EconomyResponse(0, 
+                bank.getMoney(),
+                bank.isMember(player.getUniqueId()) ? ResponseType.SUCCESS : ResponseType.FAILURE,
+                 null);
     }
 
     /**
@@ -474,7 +549,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        return isBankOwner(name, playerName);
     }
 
     /**
@@ -486,7 +561,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public EconomyResponse isBankMember(String name, OfflinePlayer player) {
-        return new EconomyResponse(0,0, EconomyResponse.ResponseType.NOT_IMPLEMENTED,"No bank support");
+        return isBankOwner(name, player);
     }
 
     /**
@@ -496,7 +571,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public List<String> getBanks() {
-        return new ArrayList<>();
+        return Arrays.asList((String[]) bankPDS.getAccounts().toArray());
     }
 
     /**
@@ -516,7 +591,12 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        return true;
+        if (playerPDS.has(player.getUniqueId())) {
+            return false;
+        } else {
+            playerPDS.write(player.getUniqueId(), 0.0);
+            return true;
+        }
     }
 
     /**
@@ -526,7 +606,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean createPlayerAccount(String playerName, String worldName) {
-        return createPlayerAccount(Bukkit.getOfflinePlayer(playerName),worldName);
+        return createPlayerAccount(Bukkit.getOfflinePlayer(playerName));
     }
 
     /**
@@ -539,6 +619,6 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
-        return true;
+        return createPlayerAccount(player);
     }
 }

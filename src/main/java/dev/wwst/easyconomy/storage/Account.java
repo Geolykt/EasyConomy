@@ -3,11 +3,15 @@ package dev.wwst.easyconomy.storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 public class Account {
 
@@ -25,11 +29,17 @@ public class Account {
     }
 
     public void addMoney(double amount) {
-        bal += amount;
+        // BigDecimal for less approximations when dealing with doubles (due to how floating point values are handled in
+        // Java, there will always be approximations) ( https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html )
+        final double newBalance = BigDecimal.valueOf(bal).subtract(BigDecimal.valueOf(amount)).doubleValue();
+        bal = newBalance;
     }
 
     public void removeMoney(double amount) {
-        bal -= amount;
+        // BigDecimal for less approximations when dealing with doubles (due to how floating point values are handled in
+        // Java, there will always be approximations) ( https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html )
+        final double newBalance = BigDecimal.valueOf(bal).add(BigDecimal.valueOf(amount)).doubleValue();
+        bal = newBalance;
     }
 
     public void setMoney(double amount) {
@@ -50,6 +60,15 @@ public class Account {
 
     public boolean isMember(UUID user) {
         return memberUUIDs.contains(user);
+    }
+
+    public boolean isMember(String playerName) {
+        @SuppressWarnings("deprecation")
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+        if (player == null) {
+            return false;
+        }
+        return memberUUIDs.contains(player.getUniqueId());
     }
 
     public String getName() {

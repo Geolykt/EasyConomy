@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import dev.wwst.easyconomy.Easyconomy;
 
@@ -62,5 +63,17 @@ public class BinaryAccountStoarge implements Saveable {
                 accounts.put(acc.getName(), acc);
             }
         }
+    }
+
+    public Set<String> getAccounts() {
+        return accounts.keySet();
+    }
+
+    public double getMoney(String name) {
+        return isAccountExisting(name) ? getAccount(name).getMoney() : 0.0;
+    }
+
+    public Account removeAccount(String name) {
+        return accounts.remove(name);
     }
 }
