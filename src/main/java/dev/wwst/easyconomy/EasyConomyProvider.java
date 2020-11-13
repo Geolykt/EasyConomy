@@ -196,7 +196,7 @@ public class EasyConomyProvider implements Economy {
     public double getBalance(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
-            return bankPDS.getMoney(playerName);
+            return bankBalance(playerName).balance;
         } else {
             return getBalance(player);
         }
@@ -292,12 +292,7 @@ public class EasyConomyProvider implements Economy {
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
-            Account account = bankPDS.getAccount(playerName);
-            if (account == null) {
-                return new EconomyResponse(0, 0, ResponseType.FAILURE, playerName + " is not a player or bank!");
-            }
-            account.removeMoney(amount);
-            return new EconomyResponse(amount, account.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
+            return bankWithdraw(playerName, amount);
         } else {
             return withdrawPlayer(player, amount);
         }
@@ -357,12 +352,7 @@ public class EasyConomyProvider implements Economy {
     public EconomyResponse depositPlayer(String playerName, double amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
-            Account account = bankPDS.getAccount(playerName);
-            if (account == null) {
-                return new EconomyResponse(0, 0, ResponseType.FAILURE, playerName + " is not a player or bank!");
-            }
-            account.addMoney(amount);
-            return new EconomyResponse(amount, account.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
+            return bankDeposit(playerName, amount);
         } else {
             return depositPlayer(player, amount);
         }
