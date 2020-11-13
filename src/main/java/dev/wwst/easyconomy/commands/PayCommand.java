@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class PayCommand implements CommandExecutor {
 
@@ -18,14 +19,15 @@ public class PayCommand implements CommandExecutor {
 
     private final double minimumTransactionAmount;
 
-    public PayCommand(Economy economy, MessageTranslator translator) {
+    public PayCommand(@NotNull Economy economy, @NotNull MessageTranslator translator) {
         eco = economy;
         msg = translator;
         minimumTransactionAmount = Configuration.get().getDouble("minimumTransactionAmount",0.1d);
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender,
+            @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!(sender instanceof Player)) {
             sender.sendMessage(msg.getMessage("general.playerOnly",true));
             return true;

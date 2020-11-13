@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import dev.wwst.easyconomy.Easyconomy;
 
 /**
@@ -19,18 +22,19 @@ public class BinaryAccountStoarge implements Saveable {
     private final File storageLoc;
     private final HashMap<String, Account> accounts = new HashMap<>();
 
-    public BinaryAccountStoarge(File file, Easyconomy plugin) throws IOException {
+    public BinaryAccountStoarge(@NotNull File file, @NotNull Easyconomy plugin) throws IOException {
         file.createNewFile();
         this.storageLoc = file;
         reload();
         plugin.addSaveable(this);
     }
 
-    public void addAccount(Account acc) {
+    public void addAccount(@NotNull Account acc) {
         accounts.put(acc.getName(), acc);
     }
 
-    public Account getAccount(String name) {
+    @Nullable
+    public Account getAccount(@NotNull String name) {
         return accounts.get(name);
     }
 
@@ -39,11 +43,11 @@ public class BinaryAccountStoarge implements Saveable {
      * @param acc The account to add
      * @return True if the account was already added, false otherwise
      */
-    public boolean addIfAbsent(Account acc) {
+    public boolean addIfAbsent(@NotNull Account acc) {
         return accounts.putIfAbsent(acc.getName(), acc) != null;
     }
 
-    public boolean isAccountExisting(String name) {
+    public boolean isAccountExisting(@NotNull String name) {
         return accounts.containsKey(name);
     }
 
@@ -69,6 +73,7 @@ public class BinaryAccountStoarge implements Saveable {
         }
     }
 
+    @NotNull
     public Set<String> getAccounts() {
         return accounts.keySet();
     }
@@ -78,11 +83,11 @@ public class BinaryAccountStoarge implements Saveable {
      * @param name The bank of the name
      * @return The amount of money within a given bank.
      */
-    public double getMoney(String name) {
+    public double getMoney(@NotNull String name) {
         return isAccountExisting(name) ? getAccount(name).getMoney() : 0.0;
     }
 
-    public Account removeAccount(String name) {
+    public Account removeAccount(@NotNull String name) {
         return accounts.remove(name);
     }
 
@@ -93,7 +98,7 @@ public class BinaryAccountStoarge implements Saveable {
      * @param defaultValue The default value to return
      * @return The amount of money within a given bank.
      */
-    public double getBalanceOrDefault(String name, double defaultValue) {
+    public double getBalanceOrDefault(@NotNull String name, double defaultValue) {
         return isAccountExisting(name) ? getAccount(name).getMoney() : defaultValue;
     }
 }

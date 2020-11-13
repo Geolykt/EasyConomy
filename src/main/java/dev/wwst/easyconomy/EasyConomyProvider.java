@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +35,9 @@ public class EasyConomyProvider implements Economy {
     private final String currencyFormatSingular,
             currencyFormatPlural;
 
-    public EasyConomyProvider(FileConfiguration config, Easyconomy invokingPlugin) throws IOException {
-        playerPDS = new BinaryDataStorage(config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
+    public EasyConomyProvider(@NotNull FileConfiguration config, @NotNull Easyconomy invokingPlugin) throws IOException {
+        playerPDS = new BinaryDataStorage(invokingPlugin,
+                config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
         bankPDS = new BinaryAccountStoarge(new File(config.getString("storage-location-bank", "banks.dat")), invokingPlugin);
 
         if(Configuration.get().getBoolean("enable-logging",true))
@@ -47,6 +49,7 @@ public class EasyConomyProvider implements Economy {
         currencyFormatPlural = ChatColor.translateAlternateColorCodes('&',config.getString("names.currencyFormatPlural","%s Dollars"));
     }
 
+    @NotNull
     public PlayerDataStorage getStorage() {
         return playerPDS;
     }
@@ -67,6 +70,7 @@ public class EasyConomyProvider implements Economy {
      * @return Name of Economy Method
      */
     @Override
+    @NotNull
     public String getName() {
         return "EasyConomy";
     }
@@ -101,6 +105,7 @@ public class EasyConomyProvider implements Economy {
      * @return Human readable string describing amount
      */
     @Override
+    @NotNull
     public String format(double amount) {
         int decimalsShown = Configuration.get().getInt("decimalsShown");
         if(decimalsShown >= 0) {
@@ -117,6 +122,7 @@ public class EasyConomyProvider implements Economy {
      * @return name of the currency (plural)
      */
     @Override
+    @NotNull
     public String currencyNamePlural() {
         return Configuration.get().getString("names.currencyNamePlural","Dollars");
     }
@@ -128,6 +134,7 @@ public class EasyConomyProvider implements Economy {
      * @return name of the currency (singular)
      */
     @Override
+    @NotNull
     public String currencyNameSingular() {
         return Configuration.get().getString("names.currencyNameSingular","Dollar");
     }
@@ -137,7 +144,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #hasAccount(OfflinePlayer)} instead.
      */
     @Override
-    public boolean hasAccount(String playerName) {
+    public boolean hasAccount(@NotNull String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             return bankPDS.getAccount(playerName) != null;
@@ -155,7 +162,7 @@ public class EasyConomyProvider implements Economy {
      * @return if the player has an account
      */
     @Override
-    public boolean hasAccount(OfflinePlayer player) {
+    public boolean hasAccount(@NotNull OfflinePlayer player) {
         return playerPDS.has(player.getUniqueId());
     }
 
@@ -165,7 +172,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #hasAccount(OfflinePlayer, String)} instead.
      */
     @Override
-    public boolean hasAccount(String playerName, String worldName) {
+    public boolean hasAccount(@NotNull String playerName, @NotNull String worldName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             return bankPDS.getAccount(playerName) != null;
@@ -184,7 +191,7 @@ public class EasyConomyProvider implements Economy {
      * @return if the player has an account
      */
     @Override
-    public boolean hasAccount(OfflinePlayer player, String worldName) {
+    public boolean hasAccount(@NotNull OfflinePlayer player, @NotNull String worldName) {
         return hasAccount(player);
     }
 
@@ -193,7 +200,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #getBalance(OfflinePlayer)} instead.
      */
     @Override
-    public double getBalance(String playerName) {
+    public double getBalance(@NotNull String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             return bankBalance(playerName).balance;
@@ -209,7 +216,7 @@ public class EasyConomyProvider implements Economy {
      * @return Amount currently held in players account
      */
     @Override
-    public double getBalance(OfflinePlayer player) {
+    public double getBalance(@NotNull OfflinePlayer player) {
         return playerPDS.getPlayerData(player);
     }
 
@@ -219,7 +226,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #getBalance(OfflinePlayer, String)} instead.
      */
     @Override
-    public double getBalance(String playerName, String world) {
+    public double getBalance(@NotNull String playerName, @NotNull String world) {
         return getBalance(playerName);
     }
 
@@ -232,7 +239,7 @@ public class EasyConomyProvider implements Economy {
      * @return Amount currently held in players account
      */
     @Override
-    public double getBalance(OfflinePlayer player, String world) {
+    public double getBalance(@NotNull OfflinePlayer player, @NotNull String world) {
         return getBalance(player);
     }
 
@@ -242,7 +249,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #has(OfflinePlayer, double)} instead.
      */
     @Override
-    public boolean has(String playerName, double amount) {
+    public boolean has(@NotNull String playerName, double amount) {
         return getBalance(playerName) >= amount;
     }
 
@@ -254,7 +261,7 @@ public class EasyConomyProvider implements Economy {
      * @return True if <b>player</b> has <b>amount</b>, False else wise
      */
     @Override
-    public boolean has(OfflinePlayer player, double amount) {
+    public boolean has(@NotNull OfflinePlayer player, double amount) {
         return getBalance(player) >= amount;
     }
 
@@ -265,7 +272,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use @{link {@link #has(OfflinePlayer, String, double)} instead.
      */
     @Override
-    public boolean has(String playerName, String worldName, double amount) {
+    public boolean has(@NotNull String playerName, @NotNull String worldName, double amount) {
         return getBalance(playerName) >= amount;
     }
 
@@ -279,7 +286,7 @@ public class EasyConomyProvider implements Economy {
      * @return True if <b>player</b> has <b>amount</b>, False else wise
      */
     @Override
-    public boolean has(OfflinePlayer player, String worldName, double amount) {
+    public boolean has(@NotNull OfflinePlayer player, @NotNull String worldName, double amount) {
         return getBalance(player) >= amount;
     }
 
@@ -289,7 +296,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #withdrawPlayer(OfflinePlayer, double)} instead.
      */
     @Override
-    public EconomyResponse withdrawPlayer(String playerName, double amount) {
+    @NotNull 
+    public EconomyResponse withdrawPlayer(@NotNull String playerName, double amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             return bankWithdraw(playerName, amount);
@@ -306,7 +314,8 @@ public class EasyConomyProvider implements Economy {
      * @return Detailed response of transaction
      */
     @Override
-    public EconomyResponse withdrawPlayer(OfflinePlayer player, double amount) {
+    @NotNull
+    public EconomyResponse withdrawPlayer(@NotNull OfflinePlayer player, double amount) {
         final double oldBalance = getBalance(player);
         // BigDecimal for less approximations when dealing with doubles (due to how floating point values are handled in
         // Java, there will always be approximations) ( https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html )
@@ -325,7 +334,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #withdrawPlayer(OfflinePlayer, String, double)} instead.
      */
     @Override
-    public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
+    @NotNull
+    public EconomyResponse withdrawPlayer(@NotNull String playerName, @NotNull String worldName, double amount) {
         return withdrawPlayer(playerName, amount);
     }
 
@@ -339,7 +349,8 @@ public class EasyConomyProvider implements Economy {
      * @return Detailed response of transaction
      */
     @Override
-    public EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double amount) {
+    @NotNull
+    public EconomyResponse withdrawPlayer(@NotNull OfflinePlayer player, @NotNull String worldName, double amount) {
         return withdrawPlayer(player, amount);
     }
 
@@ -349,7 +360,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #depositPlayer(OfflinePlayer, double)} instead.
      */
     @Override
-    public EconomyResponse depositPlayer(String playerName, double amount) {
+    @NotNull
+    public EconomyResponse depositPlayer(@NotNull String playerName, double amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             return bankDeposit(playerName, amount);
@@ -366,7 +378,8 @@ public class EasyConomyProvider implements Economy {
      * @return Detailed response of transaction
      */
     @Override
-    public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
+    @NotNull
+    public EconomyResponse depositPlayer(@NotNull OfflinePlayer player, double amount) {
         return withdrawPlayer(player,-amount);
     }
 
@@ -377,7 +390,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {@link #depositPlayer(OfflinePlayer, String, double)} instead.
      */
     @Override
-    public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
+    @NotNull
+    public EconomyResponse depositPlayer(@NotNull String playerName, @NotNull String worldName, double amount) {
         return depositPlayer(playerName, amount);
     }
 
@@ -391,7 +405,8 @@ public class EasyConomyProvider implements Economy {
      * @return Detailed response of transaction
      */
     @Override
-    public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double amount) {
+    @NotNull
+    public EconomyResponse depositPlayer(@NotNull OfflinePlayer player, @NotNull String worldName, double amount) {
         return depositPlayer(player, amount);
     }
 
@@ -401,7 +416,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #createBank(String, OfflinePlayer)} instead.
      */
     @Override
-    public EconomyResponse createBank(String name, String player) {
+    @NotNull
+    public EconomyResponse createBank(@NotNull String name, @NotNull String player) {
         if (bankPDS.isAccountExisting(name)) {
             return new EconomyResponse(0, bankPDS.getMoney(name),
                     EconomyResponse.ResponseType.FAILURE, "Bank already exists.");
@@ -423,7 +439,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse createBank(String name, OfflinePlayer player) {
+    @NotNull
+    public EconomyResponse createBank(@NotNull String name, @NotNull OfflinePlayer player) {
         if (bankPDS.isAccountExisting(name)) {
             return new EconomyResponse(0, bankPDS.getMoney(name),
                     EconomyResponse.ResponseType.FAILURE, "Bank already exists.");
@@ -441,7 +458,8 @@ public class EasyConomyProvider implements Economy {
      * @return if the operation completed successfully
      */
     @Override
-    public EconomyResponse deleteBank(String name) {
+    @NotNull
+    public EconomyResponse deleteBank(@NotNull String name) {
         Account bank = bankPDS.removeAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -457,7 +475,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse bankBalance(String name) {
+    @NotNull
+    public EconomyResponse bankBalance(@NotNull String name) {
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -474,7 +493,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse bankHas(String name, double amount) {
+    @NotNull
+    public EconomyResponse bankHas(@NotNull String name, double amount) {
         // TODO what should the method really do?
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
@@ -496,7 +516,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse bankWithdraw(String name, double amount) {
+    @NotNull
+    public EconomyResponse bankWithdraw(@NotNull String name, double amount) {
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -516,7 +537,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse bankDeposit(String name, double amount) {
+    @NotNull
+    public EconomyResponse bankDeposit(@NotNull String name, double amount) {
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -534,7 +556,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #isBankOwner(String, OfflinePlayer)} instead.
      */
     @Override
-    public EconomyResponse isBankOwner(String name, String playerName) {
+    @NotNull
+    public EconomyResponse isBankOwner(@NotNull String name, @NotNull String playerName) {
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -554,7 +577,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse isBankOwner(String name, OfflinePlayer player) {
+    @NotNull
+    public EconomyResponse isBankOwner(@NotNull String name, @NotNull OfflinePlayer player) {
         Account bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
@@ -572,7 +596,8 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #isBankMember(String, OfflinePlayer)} instead.
      */
     @Override
-    public EconomyResponse isBankMember(String name, String playerName) {
+    @NotNull
+    public EconomyResponse isBankMember(@NotNull String name, @NotNull String playerName) {
         return isBankOwner(name, playerName);
     }
 
@@ -584,7 +609,8 @@ public class EasyConomyProvider implements Economy {
      * @return EconomyResponse Object
      */
     @Override
-    public EconomyResponse isBankMember(String name, OfflinePlayer player) {
+    @NotNull
+    public EconomyResponse isBankMember(@NotNull String name, @NotNull OfflinePlayer player) {
         return isBankOwner(name, player);
     }
 
@@ -594,6 +620,7 @@ public class EasyConomyProvider implements Economy {
      * @return the List of Banks
      */
     @Override
+    @NotNull
     public List<String> getBanks() {
         return Arrays.asList((String[]) bankPDS.getAccounts().toArray());
     }
@@ -603,7 +630,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #createPlayerAccount(OfflinePlayer)} instead.
      */
     @Override
-    public boolean createPlayerAccount(String playerName) {
+    public boolean createPlayerAccount(@NotNull String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
             if (bankPDS.isAccountExisting(playerName)) {
@@ -624,7 +651,7 @@ public class EasyConomyProvider implements Economy {
      * @return if the account creation was successful
      */
     @Override
-    public boolean createPlayerAccount(OfflinePlayer player) {
+    public boolean createPlayerAccount(@NotNull OfflinePlayer player) {
         if (playerPDS.has(player.getUniqueId())) {
             return false;
         } else {
@@ -639,7 +666,7 @@ public class EasyConomyProvider implements Economy {
      * @deprecated As of VaultAPI 1.4 use {{@link #createPlayerAccount(OfflinePlayer, String)} instead.
      */
     @Override
-    public boolean createPlayerAccount(String playerName, String worldName) {
+    public boolean createPlayerAccount(@NotNull String playerName, @NotNull String worldName) {
         return createPlayerAccount(playerName);
     }
 
@@ -652,7 +679,7 @@ public class EasyConomyProvider implements Economy {
      * @return if the account creation was successful
      */
     @Override
-    public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
+    public boolean createPlayerAccount(@NotNull OfflinePlayer player, @NotNull String worldName) {
         return createPlayerAccount(player);
     }
 }

@@ -3,6 +3,7 @@ package dev.wwst.easyconomy.utils;
 import dev.wwst.easyconomy.Easyconomy;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.HashMap;
@@ -25,9 +26,9 @@ public class MessageTranslator {
     private final YamlConfiguration cfg;
 
 
-    private HashMap<String, String> messages;
+    private final HashMap<String, String> messages;
 
-    public MessageTranslator(String language, Easyconomy invokingPlugin) {
+    public MessageTranslator(@NotNull String language, @NotNull Easyconomy invokingPlugin) {
         this.plugin = invokingPlugin;
         prefix = Configuration.get().getString("prefix");
         messages = new HashMap<>();
@@ -54,7 +55,7 @@ public class MessageTranslator {
     }
 
     // Loading custom language files for addons
-    public void loadMessageFile(String path) {
+    public void loadMessageFile(@NotNull String path) {
         File languageFile = new File(path);
         if(!languageFile.exists()) {
             plugin.getLogger().log(Level.SEVERE, "Could not find a config file at "+path);
@@ -75,7 +76,8 @@ public class MessageTranslator {
         }
     }
 
-    public String getMessageAndReplace(String key, boolean addPrefix, Object... replacements) {
+    @NotNull
+    public String getMessageAndReplace(@NotNull String key, boolean addPrefix, @NotNull Object... replacements) {
         if(!messages.containsKey(key)) {
             return ChatColor.YELLOW+key+ ChatColor.RED +" not found!";
         }
@@ -84,18 +86,22 @@ public class MessageTranslator {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
-    public String getMessage(String key, boolean addPrefix) {
+    @NotNull
+    public String getMessage(@NotNull String key, boolean addPrefix) {
         return getMessageAndReplace(key, addPrefix, null, "");
     }
 
-    public String getMessage(String key) {
+    @NotNull
+    public String getMessage(@NotNull String key) {
         return getMessageAndReplace(key, false, null, "");
     }
 
+    @NotNull
     public YamlConfiguration getConfiguration() {
         return cfg;
     }
 
+    @NotNull
     public String getLanguage() {
         return language;
     }

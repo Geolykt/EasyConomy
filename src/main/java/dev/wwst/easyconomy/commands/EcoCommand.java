@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class EcoCommand implements CommandExecutor {
 
@@ -17,14 +18,15 @@ public class EcoCommand implements CommandExecutor {
     private final MessageTranslator msg;
     private final String version;
 
-    public EcoCommand(Economy economy, MessageTranslator translator, String ver) {
+    public EcoCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull String pluginVersion) {
         this.eco = economy;
         this.msg = translator;
-        this.version = ver;
+        this.version = pluginVersion;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender,
+            @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         label = label.toLowerCase();
         if(label.equals("eco") && args.length == 0) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&',

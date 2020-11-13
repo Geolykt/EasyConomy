@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.Configuration;
@@ -34,8 +35,8 @@ public class BinaryDataStorage implements PlayerDataStorage {
     private Map<UUID, Double> balTop;
     private double smallestBalTop = Double.MAX_VALUE;
 
-    public BinaryDataStorage(String path, int baltopLength) {
-        plugin = (Easyconomy) Bukkit.getServer().getPluginManager().getPlugin(Easyconomy.PLUGIN_NAME);
+    public BinaryDataStorage(@NotNull Easyconomy invokingPlugin, @NotNull String path, int baltopLength) {
+        plugin = invokingPlugin;
         plugin.getLogger().log(Level.INFO, "Loading Storage: " + path);
         long timestamp = System.currentTimeMillis();
 
@@ -68,16 +69,17 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
-    public double getPlayerData(OfflinePlayer player) {
+    public double getPlayerData(@NotNull OfflinePlayer player) {
         return balances.getOrDefault(player.getUniqueId(), 0.0);
     }
 
     @Override
-    public double getPlayerData(UUID player) {
+    public double getPlayerData(@NotNull UUID player) {
         return balances.getOrDefault(player, 0.0);
     }
 
     @Override
+    @NotNull
     public List<UUID> getAllData() {
         ArrayList<UUID> data = new ArrayList<>();
         balances.forEach((id, balance) -> {
@@ -112,7 +114,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
-    public void write(UUID account, double balance) {
+    public void write(@NotNull UUID account, double balance) {
         balances.put(account, balance);
         if (balance > smallestBalTop) {
             System.out.println(
@@ -149,7 +151,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
         }
     }
 
-    private void recalcBaltop(Map<UUID, Double> notSorted, int baltopLength) {
+    private void recalcBaltop(@NotNull Map<UUID, Double> notSorted, int baltopLength) {
         balTop = notSorted.entrySet().stream()
                 .sorted((c1, c2) -> -c1.getValue().compareTo(c2.getValue()))
                 .peek(val->{
@@ -162,12 +164,13 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
+    @NotNull
     public Map<UUID, Double> getBaltop() {
         return balTop;
     }
 
     @Override
-    public boolean has(UUID key) {
+    public boolean has(@NotNull UUID key) {
         return balances.containsKey(key);
     }
 }

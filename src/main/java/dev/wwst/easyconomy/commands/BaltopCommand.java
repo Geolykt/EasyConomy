@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
@@ -19,14 +20,15 @@ public class BaltopCommand implements CommandExecutor {
     private final PlayerDataStorage pds;
     private final Economy eco;
 
-    public BaltopCommand(EasyConomyProvider economy, MessageTranslator translator) {
+    public BaltopCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator) {
         msg = translator;
         eco = economy;
         pds = economy.getStorage();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender,
+            @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         String permission = Configuration.get().getString("permissions.baltop","");
         if(!"".equals(permission) && !sender.hasPermission(permission)) {

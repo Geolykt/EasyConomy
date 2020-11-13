@@ -13,6 +13,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,19 +88,21 @@ public final class Easyconomy extends JavaPlugin {
         getLogger().log(Level.INFO, "EasyConomy was disabled.");
     }
 
-
+    @NotNull 
     public String getConfigFolderPath() {
         return "plugins//EasyConomy";
     }
 
+    @NotNull 
     public static Logger getPluginLogger() {
         return INSTANCE.getLogger();
     }
 
-    public void addSaveable(Saveable saveable) {
+    public void addSaveable(@NotNull Saveable saveable) {
         toSave.add(saveable);
     }
 
+    @NotNull
     public EasyConomyProvider getEcp() {
         return ecp;
     }

@@ -4,11 +4,13 @@ import com.google.common.io.Files;
 import dev.wwst.easyconomy.Easyconomy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
+// TODO implement saveable
 public class Configuration {
 
     private static File file;
@@ -19,7 +21,7 @@ public class Configuration {
     /*
      ** Finds or generates the custom config file
      */
-    public static void setup(Easyconomy plugin){
+    public static void setup(@NotNull Easyconomy plugin){
         plugin.getLogger().log(Level.INFO, "Loading Configuration");
 
         file = new File(plugin.getDataFolder(), "config.yml");
@@ -44,6 +46,7 @@ public class Configuration {
         }
     }
 
+    @NotNull
     public static FileConfiguration get(){
         return customFile;
     }
@@ -58,7 +61,7 @@ public class Configuration {
         } catch (IOException e) { e.printStackTrace();}
     }
 
-    public static void write(String path, Object object) {
+    public static void write(@NotNull String path, @NotNull Object object) {
         if(get().contains(path)) {
             get().set(path, object);
         } else {

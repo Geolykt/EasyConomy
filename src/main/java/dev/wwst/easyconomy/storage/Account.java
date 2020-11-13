@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Account {
 
@@ -19,13 +21,13 @@ public class Account {
     private final String name;
     private double bal;
 
-    public Account(String bankName, double balance, Set<UUID> members) {
+    public Account(@NotNull String bankName, double balance, @Nullable Set<UUID> members) {
         name = bankName;
         if (name.getBytes(StandardCharsets.UTF_8).length > 127) {
             throw new IllegalArgumentException("Bank names may not be longer than 127 bytes.");
         }
         bal = balance;
-        memberUUIDs = members;
+        memberUUIDs = members == null ? new HashSet<>() : members;
     }
 
     public void addMoney(double amount) {
@@ -50,19 +52,19 @@ public class Account {
         return bal;
     }
 
-    public boolean removeMember(UUID member) {
+    public boolean removeMember(@NotNull UUID member) {
         return memberUUIDs.remove(member);
     }
 
-    public boolean addMember(UUID member) {
+    public boolean addMember(@NotNull UUID member) {
         return memberUUIDs.add(member);
     }
 
-    public boolean isMember(UUID user) {
+    public boolean isMember(@NotNull UUID user) {
         return memberUUIDs.contains(user);
     }
 
-    public boolean isMember(String playerName) {
+    public boolean isMember(@NotNull String playerName) {
         @SuppressWarnings("deprecation")
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         if (player == null) {
@@ -71,6 +73,7 @@ public class Account {
         return memberUUIDs.contains(player.getUniqueId());
     }
 
+    @NotNull
     public String getName() {
         return name;
     }
@@ -88,7 +91,7 @@ public class Account {
     // NAME is encoded in UTF-8 and STRLEN is the length of the byte array of NAME, as such
     // NAME may never be longer than 127 bytes.
 
-    public void serialize(OutputStream out) throws IOException {
+    public void serialize(@NotNull OutputStream out) throws IOException {
         byte[] nameCstr = name.getBytes(StandardCharsets.UTF_8); // The c-string representation of the name
         int headerval = memberUUIDs.size()*16 + 9 + nameCstr.length;
         ByteBuffer buff = ByteBuffer.allocate(headerval + 4)
@@ -102,7 +105,8 @@ public class Account {
         out.write(buff.array());
     }
 
-    public static Account deserialize(InputStream input) throws IOException {
+    @NotNull
+    public static Account deserialize(@NotNull InputStream input) throws IOException {
         byte[] data = new byte[4];
         if (input.read(data) == -1) {
             return null;

@@ -9,19 +9,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class BalanceCommand implements CommandExecutor {
 
     private final Economy eco;
     private final MessageTranslator msg;
 
-    public BalanceCommand(Economy economy, MessageTranslator translator) {
+    public BalanceCommand(@NotNull Economy economy, @NotNull MessageTranslator translator) {
         eco = economy;
         msg = translator;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender,
+            @NotNull Command command,
+            @NotNull String label,
+            @NotNull String[] args) {
         if(!(sender instanceof Player)) {
             if(args.length != 1) {
                 sender.sendMessage(msg.getMessageAndReplace("general.syntax",true,"/bal <playerName>"));
@@ -53,7 +57,7 @@ public class BalanceCommand implements CommandExecutor {
         return true;
     }
 
-    private void sendBalanceOfOther(CommandSender sender, String otherName) {
+    private void sendBalanceOfOther(@NotNull CommandSender sender, @NotNull String otherName) {
         @SuppressWarnings("deprecation")
         OfflinePlayer p = Bukkit.getOfflinePlayer(otherName);
         if(!p.hasPlayedBefore() || !eco.hasAccount(p)) {

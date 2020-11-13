@@ -5,24 +5,25 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Weiiswurst
  */
 public interface PlayerDataStorage extends Saveable {
 
-    public double getPlayerData(OfflinePlayer p);
+    public double getPlayerData(@NotNull OfflinePlayer p);
 
-    public double getPlayerData(UUID player);
+    public double getPlayerData(@NotNull UUID player);
 
-    public List<UUID> getAllData();
+    public @NotNull List<UUID> getAllData();
 
-    public void write(UUID key, double value);
+    public void write(@NotNull UUID key, double value);
 
     public void reload();
 
-    public Map<UUID, Double> getBaltop();
+    public @NotNull Map<UUID, Double> getBaltop();
     
-    public boolean has(UUID key);
+    public boolean has(@NotNull UUID key);
 
 }
