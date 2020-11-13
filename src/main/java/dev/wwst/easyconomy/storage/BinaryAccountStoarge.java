@@ -15,6 +15,7 @@ public class BinaryAccountStoarge implements Saveable {
     private final HashMap<String, Account> accounts = new HashMap<>();
 
     public BinaryAccountStoarge(File file, Easyconomy plugin) throws IOException {
+        file.createNewFile();
         this.location = file;
         reload();
         plugin.addSaveable(this);
