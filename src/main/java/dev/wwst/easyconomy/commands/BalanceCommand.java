@@ -1,6 +1,6 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.utils.Configuration;
+import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -15,10 +15,14 @@ public class BalanceCommand implements CommandExecutor {
 
     private final Economy eco;
     private final MessageTranslator msg;
+    private final String permission;
+    private final String permissionOther;
 
-    public BalanceCommand(@NotNull Economy economy, @NotNull MessageTranslator translator) {
+    public BalanceCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         eco = economy;
         msg = translator;
+        permission = plugin.getConfig().getString("permissions.balance", "");
+        permissionOther = plugin.getConfig().getString("permissions.othersBalance", "");
     }
 
     @Override
@@ -34,8 +38,6 @@ public class BalanceCommand implements CommandExecutor {
             sendBalanceOfOther(sender,args[0]);
             return true;
         }
-
-        String permission = Configuration.get().getString("permissions.balance", "");
         if(!"".equals(permission) && !sender.hasPermission(permission)) {
             sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permission));
             return true;
@@ -45,9 +47,8 @@ public class BalanceCommand implements CommandExecutor {
         if(args.length == 0) {
             p.sendMessage(msg.getMessageAndReplace("balance.ofSelf", true, eco.format(eco.getBalance(p))));
         } else if(args.length == 1) {
-            String otherBalancePerm = Configuration.get().getString("permissions.othersBalance","");
-            if(!"".equals(otherBalancePerm) && !sender.hasPermission(otherBalancePerm)) {
-                sender.sendMessage(msg.getMessageAndReplace("general.noPerms",true,otherBalancePerm));
+            if(!"".equals(permissionOther) && !sender.hasPermission(permissionOther)) {
+                sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permissionOther));
                 return true;
             }
             sendBalanceOfOther(sender,args[0]);
@@ -61,7 +62,7 @@ public class BalanceCommand implements CommandExecutor {
         @SuppressWarnings("deprecation")
         OfflinePlayer p = Bukkit.getOfflinePlayer(otherName);
         if(!p.hasPlayedBefore() || !eco.hasAccount(p)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,otherName));
+            sender.sendMessage(msg.getMessageAndReplace("general.noAccount", true, otherName));
         } else {
             sender.sendMessage(msg.getMessageAndReplace("balance.ofOther", true, p.getName(), eco.format(eco.getBalance(p))));
         }

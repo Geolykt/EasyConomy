@@ -2,6 +2,9 @@ package dev.wwst.easyconomy.utils;
 
 import com.google.common.io.Files;
 import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.storage.Saveable;
+
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -10,18 +13,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
-// TODO implement saveable
-public class Configuration {
+public class Configuration implements Saveable {
 
-    private static File file;
-    private static FileConfiguration customFile;
+    private final File file;
+    private final FileConfiguration customFile;
 
     private static final int CURRENT_CONFIG_VERSION = 5;
 
-    /*
-     ** Finds or generates the custom config file
-     */
-    public static void setup(@NotNull Easyconomy plugin){
+    public Configuration(@NotNull Easyconomy plugin) throws IOException, InvalidConfigurationException {
         plugin.getLogger().log(Level.INFO, "Loading Configuration");
 
         file = new File(plugin.getDataFolder(), "config.yml");
@@ -38,40 +37,36 @@ public class Configuration {
                 e.printStackTrace();
             }
             plugin.saveResource("config.yml",true);
-            plugin.getLogger().log(Level.WARNING, "!!! IT SEEMS LIKE YOU UPDATED EASYCONOMY !!!");
-            plugin.getLogger().log(Level.WARNING, "!!! YOUR OLD config.yml WAS COPIED TO config_OLD_VERSION.yml !!!");
-            plugin.getLogger().log(Level.WARNING, "!!! A NEW config.yml WITH UPDATED VALUES WAS PASTED TO config.yml INSTEAD !!!");
-            plugin.getLogger().log(Level.WARNING, "!!! STOP THE SERVER TO CHANGE VALUES IN THE NEW config.yml !!!");
-            customFile = YamlConfiguration.loadConfiguration(file);
+            plugin.getLogger().warning("!!! IT SEEMS LIKE YOU UPDATED EASYCONOMY !!!");
+            plugin.getLogger().warning("!!! YOUR OLD config.yml WAS COPIED TO config_OLD_VERSION.yml !!!");
+            plugin.getLogger().warning("!!! A NEW config.yml WITH UPDATED VALUES WAS PASTED TO config.yml INSTEAD !!!");
+            plugin.getLogger().warning("!!! STOP THE SERVER TO CHANGE VALUES IN THE NEW config.yml !!!");
+            customFile.load(file);
         }
-    }
-
-    @NotNull
-    public static FileConfiguration get(){
-        return customFile;
     }
 
     /*
      ** Saves the current FileConfiguration to the file on the disk
      */
-    public static void save() {
-        Configuration.get().options().copyDefaults(true);
+    @Override
+    public void save() {
+        customFile.options().copyDefaults(true);
         try {
             customFile.save(file);
         } catch (IOException e) { e.printStackTrace();}
     }
 
-    public static void write(@NotNull String path, @NotNull Object object) {
-        if(get().contains(path)) {
-            get().set(path, object);
+    public void write(@NotNull String path, @NotNull Object object) {
+        if(customFile.contains(path)) {
+            customFile.set(path, object);
         } else {
-            get().addDefault(path, object);
+            customFile.addDefault(path, object);
         }
         save();
     }
 
-    public static void reload() {
-        customFile = YamlConfiguration.loadConfiguration(file);
+    public void reload() throws IOException, InvalidConfigurationException {
+        customFile.load(file);
     }
 
 }

@@ -18,7 +18,6 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import dev.wwst.easyconomy.Easyconomy;
-import dev.wwst.easyconomy.utils.Configuration;
 
 /**
  * An implementation of the PlayerDataStoarge that directly stores data in binary form.
@@ -96,7 +95,6 @@ public class BinaryDataStorage implements PlayerDataStorage {
     @Override
     public void save() {
         long time = System.currentTimeMillis();
-        Configuration.get().options().copyDefaults(true);
         try (FileOutputStream fileOut = new FileOutputStream(file)) {
             fileOut.write(1);
             for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
@@ -106,7 +104,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
                         .putDouble(entry.getValue())
                         .array());
             }
-            Easyconomy.getPluginLogger().info(
+            plugin.getLogger().info(
                     "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,9 +118,9 @@ public class BinaryDataStorage implements PlayerDataStorage {
             System.out.println(
                     "Recalculating top balances (If you have a lot of accounts, this should happen very rarely)");
             balTop.put(account, balance);
-            recalcBaltop(balTop, Configuration.get().getInt("baltopPlayers"));
+            recalcBaltop(balTop, plugin.getConfig().getInt("baltopPlayers"));
         }
-        Easyconomy.getPluginLogger().info("Write to " + account.toString() + ": " + balance + " and now saving.");
+        plugin.getLogger().info("Write to " + account.toString() + ": " + balance + " and now saving.");
         save();
     }
 
@@ -131,20 +129,22 @@ public class BinaryDataStorage implements PlayerDataStorage {
         long time = System.currentTimeMillis();
         try (FileInputStream fileIn = new FileInputStream(file)) {
             if (fileIn.read() != 1) {
-                Easyconomy.getPluginLogger().warning("Storage file " + file.getName() + " has an invalid version."
+                plugin.getLogger().warning("Storage file " + file.getName() + " has an invalid version."
                         + " Reading it anyway.");
             }
             ByteBuffer buff = ByteBuffer.wrap(fileIn.readAllBytes());
             if (buff.array().length % 24 != 0) {
-                Easyconomy.getPluginLogger().severe("Storage file " + file.getName() + " has an invalid length."
-                        + " It's probably corrupted and the server will be disabled to prevent damage.");
-                Bukkit.shutdown();
+                plugin.getLogger().severe("Storage file " + file.getName() + " has an invalid length."
+                        + " It's probably corrupted and the plugin will be disabled to prevent damage.");
+                Bukkit.getPluginManager().disablePlugin(plugin);
+                // This should force everything in the stack to terminate as plugins don't get disabled instantly
+                throw new IOException("Unexpected file size"); 
             }
             balances.clear();
             while (buff.hasRemaining()) {
                 balances.put(new UUID(buff.getLong(), buff.getLong()), buff.getDouble());
             }
-            Easyconomy.getPluginLogger().info(
+            plugin.getLogger().info(
                     "Storage file " + file.getName() + " loaded within " + (System.currentTimeMillis() - time) + "ms.");
         } catch (IOException e) {
             e.printStackTrace();

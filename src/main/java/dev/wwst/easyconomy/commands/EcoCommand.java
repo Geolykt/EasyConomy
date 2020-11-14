@@ -1,6 +1,6 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.utils.Configuration;
+import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -17,11 +17,13 @@ public class EcoCommand implements CommandExecutor {
     private final Economy eco;
     private final MessageTranslator msg;
     private final String version;
+    private final String permissionModify;
 
-    public EcoCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull String pluginVersion) {
+    public EcoCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin) {
         this.eco = economy;
         this.msg = translator;
-        this.version = pluginVersion;
+        this.version = invokingPlugin.getDescription().getVersion();
+        this.permissionModify = invokingPlugin.getConfig().getString("permissions.modify","");
     }
 
     @Override
@@ -34,9 +36,8 @@ public class EcoCommand implements CommandExecutor {
                     + " Version "+ version));
             return true;
         } else {
-            String permission = Configuration.get().getString("permissions.modify","");
-            if("".equals(permission) && !sender.isOp() || !permission.equals("") && !sender.hasPermission(permission)) {
-                sender.sendMessage(msg.getMessageAndReplace("general.noPerms",true,"".equals(permission)?"Operator permissions":permission));
+            if("".equals(permissionModify) && !sender.isOp() || !permissionModify.equals("") && !sender.hasPermission(permissionModify)) {
+                sender.sendMessage(msg.getMessageAndReplace("general.noPerms",true,"".equals(permissionModify)?"Operator permissions":permissionModify));
                 return true;
             }
             if(label.equals("eco")) {

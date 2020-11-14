@@ -1,6 +1,6 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.utils.Configuration;
+import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -18,11 +18,13 @@ public class PayCommand implements CommandExecutor {
     private final MessageTranslator msg;
 
     private final double minimumTransactionAmount;
+    private final String permission;
 
-    public PayCommand(@NotNull Economy economy, @NotNull MessageTranslator translator) {
+    public PayCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         eco = economy;
         msg = translator;
-        minimumTransactionAmount = Configuration.get().getDouble("minimumTransactionAmount",0.1d);
+        minimumTransactionAmount = plugin.getConfig().getDouble("minimumTransactionAmount",0.1d);
+        permission = plugin.getConfig().getString("permissions.pay","");
     }
 
     @Override
@@ -32,7 +34,6 @@ public class PayCommand implements CommandExecutor {
             sender.sendMessage(msg.getMessage("general.playerOnly",true));
             return true;
         }
-        String permission = Configuration.get().getString("permissions.pay","");
         if(!"".equals(permission) && !sender.hasPermission(permission)) {
             sender.sendMessage(msg.getMessageAndReplace("general.noperm",true,permission));
             return true;

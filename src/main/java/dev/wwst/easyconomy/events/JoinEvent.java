@@ -1,6 +1,5 @@
 package dev.wwst.easyconomy.events;
 
-import dev.wwst.easyconomy.utils.Configuration;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -25,7 +24,7 @@ public class JoinEvent implements Listener {
     public void onJoin(@NotNull PlayerJoinEvent e) {
         if (!economy.hasAccount(e.getPlayer())) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                final String cmd = "eco give "+e.getPlayer().getName()+" "+Configuration.get().getInt("startingBalance");
+                final String cmd = "eco give "+e.getPlayer().getName()+" "+plugin.getConfig().getInt("startingBalance");
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),cmd);
             }, 25);
         }

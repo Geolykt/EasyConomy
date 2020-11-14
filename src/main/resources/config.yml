@@ -40,5 +40,4 @@ names:
   currencyFormatSingular: "%s Dollar"
 
 # Do not change this value.
-# This value makes sure that the config always updates when the plugin updates.
 CONFIG_VERSION_NEVER_CHANGE_THIS: 5

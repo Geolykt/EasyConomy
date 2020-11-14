@@ -1,8 +1,8 @@
 package dev.wwst.easyconomy.commands;
 
 import dev.wwst.easyconomy.EasyConomyProvider;
+import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.storage.PlayerDataStorage;
-import dev.wwst.easyconomy.utils.Configuration;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -19,20 +19,20 @@ public class BaltopCommand implements CommandExecutor {
     private final MessageTranslator msg;
     private final PlayerDataStorage pds;
     private final Economy eco;
+    private final String baltopPermission;
 
-    public BaltopCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator) {
+    public BaltopCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         msg = translator;
         eco = economy;
         pds = economy.getStorage();
+        baltopPermission = plugin.getConfig().getString("permissions.baltop","");
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender,
             @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
-        String permission = Configuration.get().getString("permissions.baltop","");
-        if(!"".equals(permission) && !sender.hasPermission(permission)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permission));
+        if(!"".equals(baltopPermission) && !sender.hasPermission(baltopPermission)) {
+            sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, baltopPermission));
             return true;
         }
 

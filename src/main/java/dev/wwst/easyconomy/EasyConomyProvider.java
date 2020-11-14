@@ -1,7 +1,6 @@
 package dev.wwst.easyconomy;
 
 import dev.wwst.easyconomy.storage.*;
-import dev.wwst.easyconomy.utils.Configuration;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
@@ -11,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,23 +30,29 @@ public class EasyConomyProvider implements Economy {
 
     private final PlayerDataStorage playerPDS;
     private final BinaryAccountStoarge bankPDS;
-    private final Logger logger;
+    private final @Nullable Logger logger;
 
     private final String currencyFormatSingular,
-            currencyFormatPlural;
+            currencyFormatPlural,
+            currencyNameSingular,
+            currencyNamePlural;
+    private final int fractionalDigits;
 
     public EasyConomyProvider(@NotNull FileConfiguration config, @NotNull Easyconomy invokingPlugin) throws IOException {
         playerPDS = new BinaryDataStorage(invokingPlugin,
                 config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
         bankPDS = new BinaryAccountStoarge(new File(config.getString("storage-location-bank", "banks.dat")), invokingPlugin);
 
-        if(Configuration.get().getBoolean("enable-logging",true))
-            logger = Easyconomy.getPluginLogger();
+        if(config.getBoolean("enable-logging",true))
+            logger = invokingPlugin.getLogger();
         else
             logger = null;
 
+        currencyNameSingular = config.getString("names.currencyNameSingular","Dollar");
+        currencyNamePlural = config.getString("names.currencyNamePlural","Dollars");
         currencyFormatSingular = ChatColor.translateAlternateColorCodes('&',config.getString("names.currencyFormatSingular", "%s Dollar"));
         currencyFormatPlural = ChatColor.translateAlternateColorCodes('&',config.getString("names.currencyFormatPlural","%s Dollars"));
+        fractionalDigits = config.getInt("decimalsShown");
     }
 
     @NotNull
@@ -107,9 +113,8 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public String format(double amount) {
-        int decimalsShown = Configuration.get().getInt("decimalsShown");
-        if(decimalsShown >= 0) {
-            amount = new BigDecimal(amount).setScale(decimalsShown, RoundingMode.DOWN).doubleValue();
+        if(fractionalDigits >= 0) {
+            amount = new BigDecimal(amount).setScale(fractionalDigits, RoundingMode.DOWN).doubleValue();
         }
         if(amount != 1) return String.format(currencyFormatPlural,amount);
         else return String.format(currencyFormatSingular,amount);
@@ -124,7 +129,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public String currencyNamePlural() {
-        return Configuration.get().getString("names.currencyNamePlural","Dollars");
+        return currencyNamePlural;
     }
 
     /**
@@ -136,7 +141,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public String currencyNameSingular() {
-        return Configuration.get().getString("names.currencyNameSingular","Dollar");
+        return currencyNameSingular;
     }
 
     /**

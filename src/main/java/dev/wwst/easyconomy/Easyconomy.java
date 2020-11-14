@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Weiiswurst
@@ -28,19 +27,30 @@ public final class Easyconomy extends JavaPlugin {
 
     private final List<Saveable> toSave = new ArrayList<>();
 
-    private static Easyconomy INSTANCE;
-
     private EasyConomyProvider ecp;
     private MessageTranslator translator;
 
     public static final String PLUGIN_NAME = "EasyConomy";
 
+    private void handleConfigUpdateing() {
+        switch (getConfig().getInt("CONFIG_VERSION_NEVER_CHANGE_THIS")) {
+        // FALL-THROUGHS are wanted here as we want to perform incremental changes
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            getConfig().addDefault("storage-location-player", "balances.dat");
+            getConfig().addDefault("storage-location-bank", "banks.dat");
+        case 5:
+            // Things to do when the config version is bumped to 6
+        }
+    }
+
     @Override
     public void onEnable() {
-        INSTANCE = this;
         getDataFolder().mkdirs();
-        Configuration.setup(this);
-        translator = new MessageTranslator(Configuration.get().getString("language"), this);
+        handleConfigUpdateing();
+        translator = new MessageTranslator(getConfig().getString("language"), this);
 
         PluginManager pm = Bukkit.getPluginManager();
 
@@ -53,7 +63,7 @@ public final class Easyconomy extends JavaPlugin {
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if(rsp == null) {
             try {
-                ecp = new EasyConomyProvider(Configuration.get(), this);
+                ecp = new EasyConomyProvider(getConfig(), this);
             } catch (IOException e) {
                 e.printStackTrace();
                 getLogger().severe("!!! Failed important FIO Operation !!!");
@@ -68,10 +78,10 @@ public final class Easyconomy extends JavaPlugin {
             return;
         }
 
-        getCommand("balance").setExecutor(new BalanceCommand(ecp, translator));
-        getCommand("eco").setExecutor(new EcoCommand(ecp, translator, getDescription().getVersion()));
-        getCommand("pay").setExecutor(new PayCommand(ecp, translator));
-        getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
+        getCommand("balance").setExecutor(new BalanceCommand(ecp, translator, this));
+        getCommand("eco").setExecutor(new EcoCommand(ecp, translator, this));
+        getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
+        getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator, this));
 
         pm.registerEvents(new JoinEvent(ecp, this),this);
     }
@@ -86,16 +96,6 @@ public final class Easyconomy extends JavaPlugin {
             }
         }
         getLogger().log(Level.INFO, "EasyConomy was disabled.");
-    }
-
-    @NotNull 
-    public String getConfigFolderPath() {
-        return "plugins//EasyConomy";
-    }
-
-    @NotNull 
-    public static Logger getPluginLogger() {
-        return INSTANCE.getLogger();
     }
 
     public void addSaveable(@NotNull Saveable saveable) {

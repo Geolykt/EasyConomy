@@ -30,7 +30,7 @@ public class MessageTranslator {
 
     public MessageTranslator(@NotNull String language, @NotNull Easyconomy invokingPlugin) {
         this.plugin = invokingPlugin;
-        prefix = Configuration.get().getString("prefix");
+        prefix = invokingPlugin.getConfig().getString("prefix");
         messages = new HashMap<>();
         this.language = language;
 
