@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -87,12 +86,12 @@ public class BinaryAccountStoarge implements Saveable {
 
     @NotNull
     /**
-     * Returns a clone of the Bank accounts stored within the instance.
-     *  Manipulating the clone does not manipulate anything within the instance.
+     * Returns a Set of the names of the Bank accounts stored within the instance.
+     *  Manipulating the set manipulates the bank accounts stored within the instance, so great care should be taken!
      * @return A set of names of the bank accounts stored in the instance
      */
     public Set<String> getAccounts() {
-        return new LinkedHashSet<>(accounts.keySet());
+        return accounts.keySet();
     }
 
     /**
