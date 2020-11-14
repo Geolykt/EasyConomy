@@ -26,6 +26,12 @@ storage-location-player: "balances.dat"
 # The place where banks are stored, these may be used by other plugins.
 storage-location-bank: "banks.dat"
 
+saving:
+  # The delay until the databases are saved for the first time in ticks
+  delay: 100
+  # The period between database saves in ticks
+  period: 1000
+
 minimumTransactionAmount: 0.1
 # All decimals shown
 decimalsShown: -1

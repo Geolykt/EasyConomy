@@ -41,7 +41,7 @@ public class EasyConomyProvider implements Economy {
     public EasyConomyProvider(@NotNull FileConfiguration config, @NotNull Easyconomy invokingPlugin) throws IOException {
         playerPDS = new BinaryDataStorage(invokingPlugin,
                 config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
-        bankPDS = new BinaryAccountStoarge(new File(config.getString("storage-location-bank", "banks.dat")), invokingPlugin);
+        bankPDS = new BinaryAccountStoarge(config.getString("storage-location-bank", "banks.dat"), invokingPlugin);
 
         if(config.getBoolean("enable-logging",true))
             logger = invokingPlugin.getLogger();

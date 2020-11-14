@@ -120,8 +120,6 @@ public class BinaryDataStorage implements PlayerDataStorage {
             balTop.put(account, balance);
             recalcBaltop(balTop, plugin.getConfig().getInt("baltopPlayers"));
         }
-        plugin.getLogger().info("Write to " + account.toString() + ": " + balance + " and now saving.");
-        save();
     }
 
     @Override

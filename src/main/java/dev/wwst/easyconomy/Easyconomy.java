@@ -17,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Weiiswurst
@@ -40,8 +42,25 @@ public final class Easyconomy extends JavaPlugin {
         case 4:
             getConfig().addDefault("storage-location-player", "balances.dat");
             getConfig().addDefault("storage-location-bank", "banks.dat");
+            getConfig().addDefault("saving.delay", 100l); // 5 seconds delay
+            getConfig().addDefault("saving.period", 1200l); // save every minute
         case 5:
             // Things to do when the config version is bumped to 6
+        }
+    }
+
+    private void saveData() {
+        Set<Saveable> erroringSaveables = new HashSet<>();
+        for(Saveable saveable : toSave) {
+            try {
+                saveable.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+                erroringSaveables.add(saveable);
+            }
+        }
+        if (toSave.removeAll(erroringSaveables)) {
+            Bukkit.getPluginManager().disablePlugin(this);
         }
     }
 
@@ -104,17 +123,13 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
         pm.registerEvents(new JoinEvent(ecp, this),this);
+        getServer().getScheduler().runTaskTimer(this, this::saveData, 
+                getConfig().getLong("saving.delay"), getConfig().getLong("saving.period"));
     }
 
     @Override
     public void onDisable() {
-        for(Saveable saveable : toSave) {
-            try {
-                saveable.save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        saveData();
     }
 
     public void addSaveable(@NotNull Saveable saveable) {

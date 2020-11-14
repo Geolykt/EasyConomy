@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,12 +22,16 @@ public class BinaryAccountStoarge implements Saveable {
 
     private final File storageLoc;
     private final HashMap<String, Account> accounts = new HashMap<>();
+    private final Logger logger;
 
-    public BinaryAccountStoarge(@NotNull File file, @NotNull Easyconomy plugin) throws IOException {
-        file.createNewFile();
-        this.storageLoc = file;
+    public BinaryAccountStoarge(@NotNull String path, @NotNull Easyconomy plugin) throws IOException {
+        File storageFolder = new File(plugin.getDataFolder() + "/storage");
+        if (!storageFolder.exists())
+            storageFolder.mkdirs();
+        this.storageLoc = new File(plugin.getDataFolder() + "/storage", path);
         reload();
         plugin.addSaveable(this);
+        logger = plugin.getLogger();
     }
 
     public void addAccount(@NotNull Account acc) {
@@ -53,11 +58,13 @@ public class BinaryAccountStoarge implements Saveable {
 
     @Override
     public void save() throws IOException {
+        long time = System.currentTimeMillis();
         try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
             for (Map.Entry<String, Account> acc : accounts.entrySet()) {
                 acc.getValue().serialize(ioStream);
             }
         }
+        logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
     }
 
     public void reload() throws IOException {
