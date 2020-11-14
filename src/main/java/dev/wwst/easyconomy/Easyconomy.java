@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * @author Weiiswurst
@@ -78,10 +77,31 @@ public final class Easyconomy extends JavaPlugin {
             return;
         }
 
+        String perm = getConfig().getString("permissions.balance", null);
+        if ("".equals(perm)) {
+            perm = null;
+        }
+        getCommand("balance").setPermission(perm);
+        getCommand("balance").setPermissionMessage(translator.getMessageAndReplace("general.noPerms", true, perm));
+
+        perm = getConfig().getString("permissions.pay", null);
+        if ("".equals(perm)) {
+            perm = null;
+        }
+        getCommand("pay").setPermission(perm);
+        getCommand("pay").setPermissionMessage(translator.getMessageAndReplace("general.noPerms", true, perm));
+
+        perm = getConfig().getString("permissions.baltop", null);
+        if ("".equals(perm)) {
+            perm = null;
+        }
+        getCommand("baltop").setPermission(perm);
+        getCommand("baltop").setPermissionMessage(translator.getMessageAndReplace("general.noPerms", true, perm));
+
         getCommand("balance").setExecutor(new BalanceCommand(ecp, translator, this));
         getCommand("eco").setExecutor(new EcoCommand(ecp, translator, this));
         getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
-        getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator, this));
+        getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
         pm.registerEvents(new JoinEvent(ecp, this),this);
     }
@@ -95,7 +115,6 @@ public final class Easyconomy extends JavaPlugin {
                 e.printStackTrace();
             }
         }
-        getLogger().log(Level.INFO, "EasyConomy was disabled.");
     }
 
     public void addSaveable(@NotNull Saveable saveable) {

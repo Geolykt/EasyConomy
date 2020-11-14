@@ -15,13 +15,11 @@ public class BalanceCommand implements CommandExecutor {
 
     private final Economy eco;
     private final MessageTranslator msg;
-    private final String permission;
     private final String permissionOther;
 
     public BalanceCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         eco = economy;
         msg = translator;
-        permission = plugin.getConfig().getString("permissions.balance", "");
         permissionOther = plugin.getConfig().getString("permissions.othersBalance", "");
     }
 
@@ -36,10 +34,6 @@ public class BalanceCommand implements CommandExecutor {
                 return true;
             }
             sendBalanceOfOther(sender,args[0]);
-            return true;
-        }
-        if(!"".equals(permission) && !sender.hasPermission(permission)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permission));
             return true;
         }
 

@@ -18,13 +18,11 @@ public class PayCommand implements CommandExecutor {
     private final MessageTranslator msg;
 
     private final double minimumTransactionAmount;
-    private final String permission;
 
     public PayCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         eco = economy;
         msg = translator;
         minimumTransactionAmount = plugin.getConfig().getDouble("minimumTransactionAmount",0.1d);
-        permission = plugin.getConfig().getString("permissions.pay","");
     }
 
     @Override
@@ -32,10 +30,6 @@ public class PayCommand implements CommandExecutor {
             @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!(sender instanceof Player)) {
             sender.sendMessage(msg.getMessage("general.playerOnly",true));
-            return true;
-        }
-        if(!"".equals(permission) && !sender.hasPermission(permission)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.noperm",true,permission));
             return true;
         }
         if(args.length != 2) {
