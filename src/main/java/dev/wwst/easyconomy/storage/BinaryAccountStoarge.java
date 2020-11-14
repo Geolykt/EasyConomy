@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -21,7 +23,7 @@ import dev.wwst.easyconomy.Easyconomy;
 public class BinaryAccountStoarge implements Saveable {
 
     private final File storageLoc;
-    private final HashMap<String, Account> accounts = new HashMap<>();
+    private final Map<String, Account> accounts = Collections.synchronizedMap(new HashMap<>());
     private final Logger logger;
 
     public BinaryAccountStoarge(@NotNull String path, @NotNull Easyconomy plugin) throws IOException {
@@ -29,6 +31,7 @@ public class BinaryAccountStoarge implements Saveable {
         if (!storageFolder.exists())
             storageFolder.mkdirs();
         this.storageLoc = new File(plugin.getDataFolder() + "/storage", path);
+        this.storageLoc.createNewFile();
         reload();
         plugin.addSaveable(this);
         logger = plugin.getLogger();
@@ -58,13 +61,15 @@ public class BinaryAccountStoarge implements Saveable {
 
     @Override
     public void save() throws IOException {
-        long time = System.currentTimeMillis();
-        try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
-            for (Map.Entry<String, Account> acc : accounts.entrySet()) {
-                acc.getValue().serialize(ioStream);
+        synchronized (accounts) {
+            long time = System.currentTimeMillis();
+            try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
+                for (Map.Entry<String, Account> acc : accounts.entrySet()) {
+                    acc.getValue().serialize(ioStream);
+                }
             }
+            logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
         }
-        logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
     }
 
     public void reload() throws IOException {
@@ -81,8 +86,13 @@ public class BinaryAccountStoarge implements Saveable {
     }
 
     @NotNull
+    /**
+     * Returns a clone of the Bank accounts stored within the instance.
+     *  Manipulating the clone does not manipulate anything within the instance.
+     * @return A set of names of the bank accounts stored in the instance
+     */
     public Set<String> getAccounts() {
-        return accounts.keySet();
+        return new LinkedHashSet<>(accounts.keySet());
     }
 
     /**

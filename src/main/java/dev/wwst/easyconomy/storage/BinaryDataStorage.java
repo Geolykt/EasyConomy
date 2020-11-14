@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import dev.wwst.easyconomy.Easyconomy;
 public class BinaryDataStorage implements PlayerDataStorage {
 
     private final File file;
-    private final Map<UUID, Double> balances = new HashMap<>();
+    private final Map<UUID, Double> balances = Collections.synchronizedMap(new HashMap<>());
 
     private final Easyconomy plugin;
 
@@ -81,11 +82,13 @@ public class BinaryDataStorage implements PlayerDataStorage {
     @NotNull
     public List<UUID> getAllData() {
         ArrayList<UUID> data = new ArrayList<>();
-        balances.forEach((id, balance) -> {
-            if (balance != null && balance != 0.0) {
-                data.add(id);
-            }
-        });
+        synchronized (balances) {
+            balances.forEach((id, balance) -> {
+                if (balance != null && balance != 0.0) {
+                    data.add(id);
+                }
+            });
+        }
         return data;
     }
 
@@ -97,12 +100,14 @@ public class BinaryDataStorage implements PlayerDataStorage {
         long time = System.currentTimeMillis();
         try (FileOutputStream fileOut = new FileOutputStream(file)) {
             fileOut.write(1);
-            for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
-                fileOut.write(ByteBuffer.allocate(24)
-                        .putLong(entry.getKey().getMostSignificantBits())
-                        .putLong(entry.getKey().getLeastSignificantBits())
-                        .putDouble(entry.getValue())
-                        .array());
+            synchronized (balances) {
+                for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
+                    fileOut.write(ByteBuffer.allocate(24)
+                            .putLong(entry.getKey().getMostSignificantBits())
+                            .putLong(entry.getKey().getLeastSignificantBits())
+                            .putDouble(entry.getValue())
+                            .array());
+                }
             }
             plugin.getLogger().info(
                     "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");

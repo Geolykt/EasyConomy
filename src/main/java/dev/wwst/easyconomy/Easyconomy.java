@@ -123,7 +123,7 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
         pm.registerEvents(new JoinEvent(ecp, this),this);
-        getServer().getScheduler().runTaskTimer(this, this::saveData, 
+        getServer().getScheduler().runTaskTimerAsynchronously(this, this::saveData, 
                 getConfig().getLong("saving.delay"), getConfig().getLong("saving.period"));
     }
 
