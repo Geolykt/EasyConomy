@@ -26,6 +26,7 @@ import dev.wwst.easyconomy.Easyconomy;
  * @author Geolykt
  */
 public class BinaryDataStorage implements PlayerDataStorage {
+    private boolean modified = false;
 
     private final File file;
     private final Map<UUID, Double> balances = Collections.synchronizedMap(new HashMap<>());
@@ -97,22 +98,25 @@ public class BinaryDataStorage implements PlayerDataStorage {
      */
     @Override
     public void save() {
-        long time = System.currentTimeMillis();
-        try (FileOutputStream fileOut = new FileOutputStream(file)) {
-            fileOut.write(1);
-            synchronized (balances) {
-                for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
-                    fileOut.write(ByteBuffer.allocate(24)
-                            .putLong(entry.getKey().getMostSignificantBits())
-                            .putLong(entry.getKey().getLeastSignificantBits())
-                            .putDouble(entry.getValue())
-                            .array());
+        if (modified) {
+            long time = System.currentTimeMillis();
+            try (FileOutputStream fileOut = new FileOutputStream(file)) {
+                fileOut.write(1);
+                synchronized (balances) {
+                    for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
+                        fileOut.write(ByteBuffer.allocate(24)
+                                .putLong(entry.getKey().getMostSignificantBits())
+                                .putLong(entry.getKey().getLeastSignificantBits())
+                                .putDouble(entry.getValue())
+                                .array());
+                    }
                 }
+                plugin.getLogger().info(
+                        "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            plugin.getLogger().info(
-                    "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
-        } catch (IOException e) {
-            e.printStackTrace();
+            modified = false;
         }
     }
 
@@ -125,6 +129,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
             balTop.put(account, balance);
             recalcBaltop(balTop, plugin.getConfig().getInt("baltopPlayers"));
         }
+        modified = true;
     }
 
     @Override
@@ -152,6 +157,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        modified = false;
     }
 
     private void recalcBaltop(@NotNull Map<UUID, Double> notSorted, int baltopLength) {

@@ -20,6 +20,7 @@ import dev.wwst.easyconomy.Easyconomy;
  * @author Geolykt
  */
 public class BinaryAccountStoarge implements Saveable {
+    private boolean modified; // Used so the instance doesn't save unnessary amount of times.
 
     private final File storageLoc;
     private final Map<String, Account> accounts = Collections.synchronizedMap(new HashMap<>());
@@ -38,10 +39,12 @@ public class BinaryAccountStoarge implements Saveable {
 
     public void addAccount(@NotNull Account acc) {
         accounts.put(acc.getName(), acc);
+        modified = true;
     }
 
     @Nullable
     public Account getAccount(@NotNull String name) {
+        modified = true; // We have to assume that it was modified since the returning account instance could be modified.
         return accounts.get(name);
     }
 
@@ -51,6 +54,7 @@ public class BinaryAccountStoarge implements Saveable {
      * @return True if the account was already added, false otherwise
      */
     public boolean addIfAbsent(@NotNull Account acc) {
+        modified = true;
         return accounts.putIfAbsent(acc.getName(), acc) != null;
     }
 
@@ -60,14 +64,17 @@ public class BinaryAccountStoarge implements Saveable {
 
     @Override
     public void save() throws IOException {
-        synchronized (accounts) {
-            long time = System.currentTimeMillis();
-            try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
-                for (Map.Entry<String, Account> acc : accounts.entrySet()) {
-                    acc.getValue().serialize(ioStream);
+        if (modified) {
+            synchronized (accounts) {
+                long time = System.currentTimeMillis();
+                try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
+                    for (Map.Entry<String, Account> acc : accounts.entrySet()) {
+                        acc.getValue().serialize(ioStream);
+                    }
                 }
+                logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
             }
-            logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
+            modified = false;
         }
     }
 
@@ -82,6 +89,7 @@ public class BinaryAccountStoarge implements Saveable {
                 accounts.put(acc.getName(), acc);
             }
         }
+        modified = false;
     }
 
     @NotNull
@@ -91,6 +99,7 @@ public class BinaryAccountStoarge implements Saveable {
      * @return A set of names of the bank accounts stored in the instance
      */
     public Set<String> getAccounts() {
+        modified = true; // we have to assume that it's modified
         return accounts.keySet();
     }
 
@@ -104,6 +113,7 @@ public class BinaryAccountStoarge implements Saveable {
     }
 
     public Account removeAccount(@NotNull String name) {
+        modified = true;
         return accounts.remove(name);
     }
 
