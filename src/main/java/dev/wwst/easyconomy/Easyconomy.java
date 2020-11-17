@@ -65,11 +65,7 @@ public final class Easyconomy extends JavaPlugin {
     }
 
     @Override
-    public void onEnable() {
-        getDataFolder().mkdirs();
-        handleConfigUpdateing();
-        translator = new MessageTranslator(getConfig().getString("language"), this);
-
+    public void onLoad() {
         PluginManager pm = Bukkit.getPluginManager();
 
         if(!pm.isPluginEnabled("Vault")) {
@@ -95,6 +91,13 @@ public final class Easyconomy extends JavaPlugin {
             pm.disablePlugin(this);
             return;
         }
+    }
+    
+    @Override
+    public void onEnable() {
+        getDataFolder().mkdirs();
+        handleConfigUpdateing();
+        translator = new MessageTranslator(getConfig().getString("language"), this);
 
         String perm = getConfig().getString("permissions.balance", null);
         if ("".equals(perm)) {
@@ -122,7 +125,7 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
-        pm.registerEvents(new JoinEvent(ecp, this),this);
+        Bukkit.getPluginManager().registerEvents(new JoinEvent(ecp, this),this);
         getServer().getScheduler().runTaskTimerAsynchronously(this, this::saveData, 
                 getConfig().getLong("saving.delay"), getConfig().getLong("saving.period"));
     }
