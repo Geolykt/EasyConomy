@@ -1,9 +1,11 @@
 package dev.wwst.easyconomy.storage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,6 +133,24 @@ public class BinaryDataStorage implements PlayerDataStorage {
         modified = true;
     }
 
+    private static byte[] streamReadAllBytes(InputStream stream) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384]; // 16 * 1024 bytes = 16 KiB
+
+        try {
+            while ((nRead = stream.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return buffer.toByteArray();
+        }
+
+        return buffer.toByteArray();
+    }
+
     @Override
     public void reload() {
         long time = System.currentTimeMillis();
@@ -139,7 +159,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
                 plugin.getLogger().warning("Storage file " + file.getName() + " has an invalid version."
                         + " Reading it anyway.");
             }
-            ByteBuffer buff = ByteBuffer.wrap(fileIn.readAllBytes());
+            ByteBuffer buff = ByteBuffer.wrap(streamReadAllBytes(fileIn));
             if (buff.array().length % 24 != 0) {
                 plugin.getLogger().severe("Storage file " + file.getName() + " has an invalid length."
                         + " It's probably corrupted and the plugin will be disabled to prevent damage.");

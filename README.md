@@ -1,4 +1,4 @@
-This branch is the production version of what is used on the `mc.geolykt.de` server (it's still in early works, so chances are that it's not up right now).
+This branch is the jre8 compatible adaption of what is used within the geolykt-prod branch.
 It includes several changes to optimize the plugin, remove static abuse and to make it more compatible with other plugins. In short it adds more compact storage files and bank support.
 However due to this, this is not a drop-in replacement for the upstream plugin and cannot be used interchangeably.
 
@@ -15,7 +15,7 @@ EasyConomy is an economy plugin that integrates into Vault and focusses about a 
 ## Dependencies
 * A Bukkit/Spigot/Paper server with 1.16 or above
 * The [Vault Plugin](https://dev.bukkit.org/projects/vault) implementing vault-api 1.7 or beyond (Basically a bridge between plugins)
-* Java 11 or higher. This is meant to be used for serious production use, if you are still running Java 8 you are out of luck
+* Java 8 or higher. If you are using Java 11 we recommend checking out geolykt-prod instead.
 
 ## Support
 There currently is no particular discord support server, however feel free to DM me at `tristellar#9022` via discord.

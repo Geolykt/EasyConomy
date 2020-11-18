@@ -5,8 +5,8 @@ apply plugin: 'java'
 group = 'de.geolykt'
 version = '0.0.1-SNAPSHOT' // the fork is still in works
 
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
