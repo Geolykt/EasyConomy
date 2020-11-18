@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -38,7 +37,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
 
     public BinaryDataStorage(@NotNull Easyconomy invokingPlugin, @NotNull String path, int baltopLength) {
         plugin = invokingPlugin;
-        plugin.getLogger().log(Level.INFO, "Loading Storage: " + path);
+        plugin.getLogger().info("Loading Storage: " + path);
         long timestamp = System.currentTimeMillis();
 
         File storageFolder = new File(plugin.getDataFolder() + "/storage");
@@ -66,7 +65,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
             balTop = null;
         }
         timestamp = System.currentTimeMillis() - timestamp;
-        plugin.getLogger().log(Level.INFO, "Loaded Storage: " + path + " within " + timestamp + "ms");
+        plugin.getLogger().info("Loaded Storage: " + path + " within " + timestamp + "ms");
     }
 
     @Override

@@ -8,14 +8,16 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * @author Weiiswurst
  */
 public class MessageTranslator {
 
-    private static final String[] translations = new String[] {
+    /**
+     * The base translations included the in the plugin jar that need to be extracted.
+     */
+    private static final String[] TRANSLATIONS = new String[] {
             "de",
             "en",
             "fr"
@@ -37,29 +39,27 @@ public class MessageTranslator {
 
         saveDefaults();
 
-        File languageFile = new File("plugins/EasyConomy/messages_"+language+".yml");
+        String filename = "plugins/EasyConomy/messages_"+language+".yml";
+        File languageFile = new File(filename);
         if(!languageFile.exists()) {
-            plugin.getLogger().log(Level.SEVERE, "!!! The language chosen by you, "+language+", cannot be resolved!");
-            plugin.getLogger().log(Level.SEVERE, "!!! Create a file called messages_"+language+".yml in the EasyConomy folder to start!");
-            plugin.getLogger().log(Level.SEVERE, "!!! For now, the ENGLISH language file will be loaded!");
-            languageFile =new File("plugins/EasyConomy/messages_en.yml");
-            System.out.println(languageFile.exists());
-            System.out.println(languageFile.getAbsolutePath());
-            System.out.println(languageFile.getName());
+            plugin.getLogger().severe("!!! The language chosen by you, "+language+", cannot be resolved!");
+            plugin.getLogger().severe("!!! Create a file called messages_"+language+".yml in the EasyConomy folder to start!");
+            plugin.getLogger().severe("!!! For now, the ENGLISH language file will be loaded!");
+            languageFile = new File("plugins/EasyConomy/messages_en.yml");
         }
         cfg = YamlConfiguration.loadConfiguration(languageFile);
         Map<String, Object> values = cfg.getValues(true);
         for(String key : values.keySet()) {
             messages.put(key, values.get(key).toString());
         }
-        plugin.getLogger().log(Level.INFO, "Language loaded: messages_"+language+".yml");
+        plugin.getLogger().info("Language loaded: " + filename);
     }
 
-    // Loading custom language files for addons
+    // Loading custom language files for add-ons
     public void loadMessageFile(@NotNull String path) {
         File languageFile = new File(path);
         if(!languageFile.exists()) {
-            plugin.getLogger().log(Level.SEVERE, "Could not find a config file at "+path);
+            plugin.getLogger().severe("Could not find a config file at "+path);
             return;
         }
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(languageFile);
@@ -67,13 +67,13 @@ public class MessageTranslator {
         for(String key : values.keySet()) {
             messages.put(key, values.get(key).toString());
         }
-        plugin.getLogger().log(Level.INFO, "Custom language file loaded: "+path);
+        plugin.getLogger().info("Custom language file loaded: "+path);
     }
 
     private void saveDefaults() {
-        for(String translation : translations) {
+        for(String translation : TRANSLATIONS) {
             plugin.saveResource("messages_"+translation+".yml", true);
-            plugin.getLogger().log(Level.INFO, "Default language exported: messages_"+translation+".yml");
+            plugin.getLogger().info("Default language exported: messages_"+translation+".yml");
         }
     }
 
