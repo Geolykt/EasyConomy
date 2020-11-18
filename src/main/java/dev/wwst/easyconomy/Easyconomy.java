@@ -9,6 +9,7 @@ import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -64,11 +65,14 @@ public final class Easyconomy extends JavaPlugin {
         }
     }
 
+    private boolean isLoaded = false;
     @Override
     public void onLoad() {
         PluginManager pm = Bukkit.getPluginManager();
 
-        if(!pm.isPluginEnabled("Vault")) {
+        try {
+            Class.forName("net.milkbowl.vault.economy.Economy");
+        } catch (ClassNotFoundException expected) {
             getLogger().severe("!!! VAULT IS NOT INSTALLED !!!");
             getLogger().severe("!!! THE VAULT PLUGIN IS NEEDED FOR THIS PLUGIN !!!");
             pm.disablePlugin(this);
@@ -91,10 +95,14 @@ public final class Easyconomy extends JavaPlugin {
             pm.disablePlugin(this);
             return;
         }
+        isLoaded = true;
     }
-    
+
     @Override
     public void onEnable() {
+        if (!isLoaded) {
+            return;
+        }
         getDataFolder().mkdirs();
         handleConfigUpdateing();
         translator = new MessageTranslator(getConfig().getString("language"), this);
@@ -132,6 +140,9 @@ public final class Easyconomy extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (!isLoaded) {
+            return;
+        }
         saveData();
     }
 
