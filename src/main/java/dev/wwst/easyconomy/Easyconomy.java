@@ -9,7 +9,6 @@ import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -69,7 +68,7 @@ public final class Easyconomy extends JavaPlugin {
     @Override
     public void onLoad() {
         PluginManager pm = Bukkit.getPluginManager();
-
+        saveDefaultConfig();
         try {
             Class.forName("net.milkbowl.vault.economy.Economy");
         } catch (ClassNotFoundException expected) {
