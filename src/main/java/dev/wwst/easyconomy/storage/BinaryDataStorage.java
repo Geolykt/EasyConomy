@@ -39,6 +39,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
 
     private Map<UUID, Double> balTop;
     private double smallestBalTop = Double.MAX_VALUE;
+    private double lastBackup = 0;
 
     public BinaryDataStorage(@NotNull Easyconomy invokingPlugin, @NotNull String path, int baltopLength) {
         plugin = invokingPlugin;
@@ -116,8 +117,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
                                     .array());
                         }
                     }
-                    plugin.getLogger().info(
-                            "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
+                    plugin.getLogger().info("Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -130,8 +130,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
     public void write(@NotNull UUID account, double balance) {
         balances.put(account, balance);
         if (balance > smallestBalTop) {
-            System.out.println(
-                    "Recalculating top balances (If you have a lot of accounts, this should happen very rarely)");
+            System.out.println("Recalculating top balances (If you have a lot of accounts, this should happen very rarely)");
             balTop.put(account, balance);
             recalcBaltop(balTop, plugin.getConfig().getInt("baltopPlayers"));
         }
@@ -142,24 +141,47 @@ public class BinaryDataStorage implements PlayerDataStorage {
     public void reload() {
         long time = System.currentTimeMillis();
         try (FileInputStream fileIn = new FileInputStream(file)) {
-            if (fileIn.read() != 1) {
+            int version = fileIn.read();
+            ByteBuffer buff = ByteBuffer.wrap(fileIn.readAllBytes());
+            balances.clear();
+            switch (version) {
+            case 2: { // New v2 binary storage format, which stores less data on servers that have a high amount of inactive players.
+                lastBackup = buff.getLong();
+                int activeAccounts = buff.getInt(); // Used for corruption tests
+                int inactiveAccounts = buff.getInt();
+                double defaultMoney = buff.getDouble();
+                // Corruption tests
+                if (inactiveAccounts*16 + activeAccounts*24 != buff.remaining()) {
+                    plugin.getLogger().severe("Storage file " + file.getName() + " has an invalid length."
+                            + " It's probably corrupted and the plugin will be disabled to prevent damage.");
+                    Bukkit.getPluginManager().disablePlugin(plugin);
+                    throw new IOException("Unexpected file size for the v2 binary storage format.");
+                }
+                synchronized (balances) {
+                    while (inactiveAccounts-- > 0) {
+                        balances.put(new UUID(buff.getLong(), buff.getLong()), defaultMoney);
+                    }
+                }
+            }
+            case 1: // Old v1 binary storage format
+                break;
+            case -1: // File hasn't yet been created.
+                return;
+            default:
                 plugin.getLogger().warning("Storage file " + file.getName() + " has an invalid version."
                         + " Reading it anyway.");
             }
-            ByteBuffer buff = ByteBuffer.wrap(fileIn.readAllBytes());
-            if (buff.array().length % 24 != 0) {
+            if (buff.remaining() % 24 != 0) {
                 plugin.getLogger().severe("Storage file " + file.getName() + " has an invalid length."
                         + " It's probably corrupted and the plugin will be disabled to prevent damage.");
                 Bukkit.getPluginManager().disablePlugin(plugin);
                 // This should force everything in the stack to terminate as plugins don't get disabled instantly
                 throw new IOException("Unexpected file size"); 
             }
-            balances.clear();
             while (buff.hasRemaining()) {
                 balances.put(new UUID(buff.getLong(), buff.getLong()), buff.getDouble());
             }
-            plugin.getLogger().info(
-                    "Storage file " + file.getName() + " loaded within " + (System.currentTimeMillis() - time) + "ms.");
+            plugin.getLogger().info("Storage file " + file.getName() + " loaded within " + (System.currentTimeMillis() - time) + "ms.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -190,11 +212,10 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
-    public void backup(@NotNull File backupFolder) throws IOException {
-        synchronized (BinaryDataStorage.class) {
-            File backupFile = new File(backupFolder, "backup-bal-" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Date.from(Instant.now())) + ".dat");
-            Files.copy(file, backupFile);
-        }
+    public synchronized void backup(@NotNull File backupFolder) throws IOException {
+        File backupFile = new File(backupFolder, "backup-bal-" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Date.from(Instant.now())) + ".dat");
+        Files.copy(file, backupFile);
+        lastBackup = System.currentTimeMillis();
     }
 
     @Override
