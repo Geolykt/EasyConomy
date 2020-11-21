@@ -32,6 +32,12 @@ saving:
   # The period between database saves in ticks
   period: 1000
 
+  # The console (as in system command line) command to execute after the files have been copied due to the backup folder, it is primarily used for compression (however can be used for other things).
+  # I recommend calling a script file directly as java got some issues handling the commands directly, even if that is possible. In that case the first string is the command to call,
+  # all other strings in the list are the arguments. An empty list will result in no process being started. The command is executed in the plugins/<plugin>/backups/ folder.
+  # Make sure to chmod the onbackup file! The command can only run up to 15 seconds, after that it is gracefully terminated.
+  backup-postrun: ["./onbackup.sh"]
+
 minimumTransactionAmount: 0.1
 # All decimals shown
 decimalsShown: -1

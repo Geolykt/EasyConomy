@@ -190,12 +190,16 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
-    public void backup() throws IOException {
-        File backupFolder = new File(file.getParentFile().getParentFile(), "backups");
-        backupFolder.mkdir();
+    public void backup(@NotNull File backupFolder) throws IOException {
         synchronized (BinaryDataStorage.class) {
-            File backupFile = new File(backupFolder, "backup-" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Date.from(Instant.now())) + ".dat");
+            File backupFile = new File(backupFolder, "backup-bal-" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Date.from(Instant.now())) + ".dat");
             Files.copy(file, backupFile);
         }
+    }
+
+    @Override
+    @NotNull
+    public File getStorageFile() {
+        return file;
     }
 }

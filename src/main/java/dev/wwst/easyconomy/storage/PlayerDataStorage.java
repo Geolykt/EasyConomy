@@ -1,5 +1,6 @@
 package dev.wwst.easyconomy.storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ public interface PlayerDataStorage extends Saveable {
     
     public boolean has(@NotNull UUID key);
 
-    public void backup() throws IOException;
+    public void backup(@NotNull File backupDir) throws IOException;
+
+    public @NotNull File getStorageFile();
 
 }

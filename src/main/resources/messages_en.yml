@@ -25,7 +25,8 @@ baltop:
   value: "&7[&a%s&7] &b%s"
   none: "&7There are no balances to show here or this command was disabled in the config."
 
-bakup:
+backup:
   start: "&7Creating backup, please wait"
   ioissue: "&c An IO Exception occoured while performing a backup, you may want to try it again later."
   finished: "&aFinished creating backup!"
+  timeout: "&cThe backup postprocess command took too long and was terminated."

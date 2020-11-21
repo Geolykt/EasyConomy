@@ -15,6 +15,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,6 +68,7 @@ public final class Easyconomy extends JavaPlugin {
     private boolean isLoaded = false;
     @Override
     public void onLoad() {
+        getDataFolder().mkdirs();
         PluginManager pm = Bukkit.getPluginManager();
         saveDefaultConfig();
         try {
@@ -102,7 +104,10 @@ public final class Easyconomy extends JavaPlugin {
         if (!isLoaded) {
             return;
         }
-        getDataFolder().mkdirs();
+        File backupFolder = new File(ecp.getStorage().getStorageFile().getParentFile().getParentFile(), "backups");
+        if (backupFolder.mkdir()) {
+            this.saveResource("backups/onbackup.sh", false);
+        }
         handleConfigUpdateing();
         translator = new MessageTranslator(getConfig().getString("language"), this);
 
@@ -128,7 +133,7 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("baltop").setPermissionMessage(translator.getMessageAndReplace("general.noPerms", true, perm));
 
         getCommand("balance").setExecutor(new BalanceCommand(ecp, translator, this));
-        getCommand("eco").setExecutor(new EcoCommand(ecp, translator, this));
+        getCommand("eco").setExecutor(new EcoCommand(ecp, translator, this, backupFolder));
         getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 

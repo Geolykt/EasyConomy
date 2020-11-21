@@ -25,7 +25,8 @@ baltop:
   value: "&7[&a%s&7] &b%s"
   none: "&7Il n'y a pas de soldes à afficher ou la commande est désactivée dans la config."
 
-bakup:
+backup:
   start: "&7Création d'une sauvegarde, attendez svp.."
   ioissue: "&cIl y a eu une erreur durant la création de la sauvegarde !"
   finished: "&aSauvegarde effectuée !"
+  timeout: "&cIl y a eu une erreur durant la création de la sauvegarde !" # TODO actually use a more correct translation

@@ -25,7 +25,8 @@ baltop:
   value: "&7[&a%s&7] &b%s"
   none: "&7Niemand hat ein Konto oder dieser Befehl wurde in der config.yml ausgeschaltet."
 
-bakup:
+backup:
   start: "&7Erstelle backup..."
   ioissue: "&c Ein IO-Fehler ist beim Erstellen des Backups aufgetreten, versuchen Sie es später noch einmal."
   finished: "&aBackup fertig erstellt!"
+  timeout: "&cDer Backup braucht zu viel zeit um fertiggestellt zu werden und wurde terminiert."

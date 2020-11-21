@@ -135,11 +135,9 @@ public class BinaryAccountStoarge implements Saveable {
         return isAccountExisting(name) ? getAccount(name).getMoney() : defaultValue;
     }
 
-    public void backup() throws IOException {
-        File backupFolder = new File(storageLoc.getParentFile().getParentFile(), "backups");
-        backupFolder.mkdir();
+    public void backup(@NotNull File backupDir) throws IOException {
         synchronized (BinaryAccountStoarge.class) {
-            File backupFile = new File(backupFolder, "backup-" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Date.from(Instant.now())) + ".dat");
+            File backupFile = new File(backupDir, "backup-bank-" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Date.from(Instant.now())) + ".dat");
             Files.copy(storageLoc, backupFile);
         }
     }

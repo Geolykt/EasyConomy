@@ -8,7 +8,10 @@ import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,16 +29,25 @@ public class EcoCommand implements CommandExecutor {
     private final MessageTranslator msg;
     private final String version;
     private final String permissionModify;
+    private final String[] backupCMD;
     private final Easyconomy plugin;
+    private final File backupDir;
 
-    public EcoCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin) {
+    public EcoCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
         this.eco = economy;
         this.balanceFile = economy.getStorage();
         this.bankFile = economy.getBankStorage();
         this.msg = translator;
         this.version = invokingPlugin.getDescription().getVersion();
         this.permissionModify = invokingPlugin.getConfig().getString("permissions.modify","");
+        List<String> cmd = invokingPlugin.getConfig().getStringList("saving.backup-postrun");
+        if (cmd == null || cmd.isEmpty()) {
+            backupCMD = null;
+        } else {
+            backupCMD = cmd.toArray(new String[0]);
+        }
         this.plugin = invokingPlugin;
+        this.backupDir = backupDirectory;
     }
 
     @Override
@@ -64,12 +76,26 @@ public class EcoCommand implements CommandExecutor {
                                     this.balanceFile.save();
                                     this.bankFile.save();
                                     // Backup files
-                                    this.balanceFile.backup();
-                                    this.bankFile.backup();
+                                    this.balanceFile.backup(backupDir);
+                                    this.bankFile.backup(backupDir);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     sender.sendMessage(msg.getMessageAndReplace("backup.ioissue", true));
                                     return;
+                                }
+                                if (backupCMD != null) {
+                                    ProcessBuilder procBuilder = new ProcessBuilder(backupCMD).directory(backupDir).inheritIO();
+                                    try {
+                                        Process proc = procBuilder.start();
+                                        if (!proc.waitFor(15, TimeUnit.SECONDS)) {
+                                            sender.sendMessage(msg.getMessage("backup.timeout", true));
+                                            proc.destroy();
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                                 sender.sendMessage(msg.getMessage("backup.finished", true));
                             });
