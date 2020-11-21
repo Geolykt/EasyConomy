@@ -1,9 +1,15 @@
 package dev.wwst.easyconomy.commands;
 
+import dev.wwst.easyconomy.EasyConomyProvider;
 import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
+import dev.wwst.easyconomy.storage.PlayerDataStorage;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+
+import java.io.IOException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -15,49 +21,71 @@ import org.jetbrains.annotations.NotNull;
 public class EcoCommand implements CommandExecutor {
 
     private final Economy eco;
+    private final PlayerDataStorage balanceFile;
+    private final BinaryAccountStoarge bankFile;
     private final MessageTranslator msg;
     private final String version;
     private final String permissionModify;
+    private final Easyconomy plugin;
 
-    public EcoCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin) {
+    public EcoCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin) {
         this.eco = economy;
+        this.balanceFile = economy.getStorage();
+        this.bankFile = economy.getBankStorage();
         this.msg = translator;
         this.version = invokingPlugin.getDescription().getVersion();
         this.permissionModify = invokingPlugin.getConfig().getString("permissions.modify","");
+        this.plugin = invokingPlugin;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender,
             @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        label = label.toLowerCase();
-        if(label.equals("eco") && args.length == 0) {
+        if(command.getName().equals("eco") && args.length == 0) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    "&aEasyConomy by Weiiswurst#0016, forked by Geolykt."
-                    + " Version "+ version));
+                    "&aEasyConomy by Weiiswurst#0016, forked by Geolykt." + " Running version "+ version));
             return true;
         } else {
             if("".equals(permissionModify) && !sender.isOp() || !permissionModify.equals("") && !sender.hasPermission(permissionModify)) {
                 sender.sendMessage(msg.getMessageAndReplace("general.noPerms",true,"".equals(permissionModify)?"Operator permissions":permissionModify));
                 return true;
             }
-            if(label.equals("eco")) {
-                if(args.length == 1 && args[0].equalsIgnoreCase("help")) {
-                    sender.sendMessage(msg.getMessage("eco.helpMessage",true));
-                    return true;
-                }
-                if(args.length != 3) {
+            if(command.getName().equals("eco")) {
+                if (args.length != 3) {
+                    if (args.length == 1) {
+                        if (args[0].equalsIgnoreCase("help")) {
+                            sender.sendMessage(msg.getMessage("eco.helpMessage",true));
+                            return true;
+                        } else if (args[0].equalsIgnoreCase("backup")) {
+                            sender.sendMessage(msg.getMessage("backup.start", true));
+                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                try {
+                                    // Save files
+                                    this.balanceFile.save();
+                                    this.bankFile.save();
+                                    // Backup files
+                                    this.balanceFile.backup();
+                                    this.bankFile.backup();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    sender.sendMessage(msg.getMessageAndReplace("backup.ioissue", true));
+                                    return;
+                                }
+                                sender.sendMessage(msg.getMessage("backup.finished", true));
+                            });
+                            return true;
+                        }
+                    }
                     sender.sendMessage(msg.getMessageAndReplace("general.syntax", true, "/eco " + args[0] + " <playerName> <amount>"));
                     return true;
+                } else {
+                    return performOperation(sender, args[0], args[1], args[2]);
                 }
             } else if(args.length != 2) {
                 sender.sendMessage(msg.getMessageAndReplace("general.syntax", true, "/givemoney|takemoney|setmoney <playerName> <amount>"));
                 return true;
-            }
-
-            if(label.equals("eco")) {
-                return performOperation(sender,args[0],args[1],args[2]);
             } else {
-                return performOperation(sender,label,args[0],args[1]);
+                return performOperation(sender, command.getName(), args[0], args[1]);
             }
         }
     }

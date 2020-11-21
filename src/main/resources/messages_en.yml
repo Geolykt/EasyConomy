@@ -11,7 +11,7 @@ balance:
   ofSelf: "Balance: &6%s"
 
 eco:
-  helpMessage: "Available commands: &a/eco, /eco give|take|set <player> <amount>, /bal [player], /pay <player> <amount>"
+  helpMessage: "Available commands: &a/eco, /eco backup, /eco give|take|set <player> <amount>, /bal [player], /pay <player> <amount>, /baltop"
   success: "You changed the balance of %s by %s. He now has %s"
 
 pay:
@@ -24,3 +24,8 @@ baltop:
   start: "&aPlayers with the highest balances:"
   value: "&7[&a%s&7] &b%s"
   none: "&7There are no balances to show here or this command was disabled in the config."
+
+bakup:
+  start: "&7Creating backup, please wait"
+  ioissue: "&c An IO Exception occoured while performing a backup, you may want to try it again later."
+  finished: "&aFinished creating backup!"

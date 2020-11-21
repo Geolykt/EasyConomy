@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +15,8 @@ import java.util.logging.Logger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.io.Files;
 
 import dev.wwst.easyconomy.Easyconomy;
 
@@ -66,13 +71,15 @@ public class BinaryAccountStoarge implements Saveable {
     public void save() throws IOException {
         if (modified) {
             synchronized (accounts) {
-                long time = System.currentTimeMillis();
-                try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
-                    for (Map.Entry<String, Account> acc : accounts.entrySet()) {
-                        acc.getValue().serialize(ioStream);
+                synchronized (BinaryAccountStoarge.class) {
+                    long time = System.currentTimeMillis();
+                    try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
+                        for (Map.Entry<String, Account> acc : accounts.entrySet()) {
+                            acc.getValue().serialize(ioStream);
+                        }
                     }
+                    logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
                 }
-                logger.info("Saved " + storageLoc.getName() + " within " + (System.currentTimeMillis() - time) + "ms.");
             }
             modified = false;
         }
@@ -126,5 +133,14 @@ public class BinaryAccountStoarge implements Saveable {
      */
     public double getBalanceOrDefault(@NotNull String name, double defaultValue) {
         return isAccountExisting(name) ? getAccount(name).getMoney() : defaultValue;
+    }
+
+    public void backup() throws IOException {
+        File backupFolder = new File(storageLoc.getParentFile().getParentFile(), "backups");
+        backupFolder.mkdir();
+        synchronized (BinaryAccountStoarge.class) {
+            File backupFile = new File(backupFolder, "backup-" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Date.from(Instant.now())) + ".dat");
+            Files.copy(storageLoc, backupFile);
+        }
     }
 }

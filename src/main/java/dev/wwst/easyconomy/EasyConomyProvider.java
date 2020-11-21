@@ -61,6 +61,11 @@ public class EasyConomyProvider implements Economy {
         return playerPDS;
     }
 
+    @NotNull
+    public BinaryAccountStoarge getBankStorage() {
+        return bankPDS;
+    }
+
     /**
      * Checks if economy method is enabled.
      *

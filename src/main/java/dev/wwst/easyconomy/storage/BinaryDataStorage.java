@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
+
+import com.google.common.io.Files;
 
 import dev.wwst.easyconomy.Easyconomy;
 
@@ -99,21 +104,23 @@ public class BinaryDataStorage implements PlayerDataStorage {
     public void save() {
         if (modified) {
             long time = System.currentTimeMillis();
-            try (FileOutputStream fileOut = new FileOutputStream(file)) {
-                fileOut.write(1);
-                synchronized (balances) {
-                    for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
-                        fileOut.write(ByteBuffer.allocate(24)
-                                .putLong(entry.getKey().getMostSignificantBits())
-                                .putLong(entry.getKey().getLeastSignificantBits())
-                                .putDouble(entry.getValue())
-                                .array());
+            synchronized (BinaryDataStorage.class) {
+                try (FileOutputStream fileOut = new FileOutputStream(file)) {
+                    fileOut.write(1);
+                    synchronized (balances) {
+                        for (Map.Entry<UUID, Double> entry : balances.entrySet()) {
+                            fileOut.write(ByteBuffer.allocate(24)
+                                    .putLong(entry.getKey().getMostSignificantBits())
+                                    .putLong(entry.getKey().getLeastSignificantBits())
+                                    .putDouble(entry.getValue())
+                                    .array());
+                        }
                     }
+                    plugin.getLogger().info(
+                            "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                plugin.getLogger().info(
-                        "Storage file " + file.getName() + " saved within " + (System.currentTimeMillis() - time) + "ms.");
-            } catch (IOException e) {
-                e.printStackTrace();
             }
             modified = false;
         }
@@ -180,5 +187,15 @@ public class BinaryDataStorage implements PlayerDataStorage {
     @Override
     public boolean has(@NotNull UUID key) {
         return balances.containsKey(key);
+    }
+
+    @Override
+    public void backup() throws IOException {
+        File backupFolder = new File(file.getParentFile().getParentFile(), "backups");
+        backupFolder.mkdir();
+        synchronized (BinaryDataStorage.class) {
+            File backupFile = new File(backupFolder, "backup-" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Date.from(Instant.now())) + ".dat");
+            Files.copy(file, backupFile);
+        }
     }
 }

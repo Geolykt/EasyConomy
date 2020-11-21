@@ -1,5 +1,6 @@
 package dev.wwst.easyconomy.storage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,5 +26,7 @@ public interface PlayerDataStorage extends Saveable {
     public @NotNull Map<UUID, Double> getBaltop();
     
     public boolean has(@NotNull UUID key);
+
+    public void backup() throws IOException;
 
 }
