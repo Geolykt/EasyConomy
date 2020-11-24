@@ -105,9 +105,7 @@ public final class Easyconomy extends JavaPlugin {
             return;
         }
         File backupFolder = new File(ecp.getStorage().getStorageFile().getParentFile().getParentFile(), "backups");
-        if (backupFolder.mkdir()) {
-            this.saveResource("backups/onbackup.sh", false);
-        }
+        backupFolder.mkdir();
         handleConfigUpdateing();
         translator = new MessageTranslator(getConfig().getString("language"), this);
 
@@ -137,7 +135,9 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
 
-        Bukkit.getPluginManager().registerEvents(new JoinEvent(ecp, this),this);
+        if (getConfig().getInt("startingBalance") != 0) {
+            Bukkit.getPluginManager().registerEvents(new JoinEvent(ecp, this),this);
+        }
         getServer().getScheduler().runTaskTimerAsynchronously(this, this::saveData, 
                 getConfig().getLong("saving.delay"), getConfig().getLong("saving.period"));
     }

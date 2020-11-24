@@ -3,10 +3,10 @@ import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'java'
 
 group = 'de.geolykt'
-version = '0.0.1-SNAPSHOT' // the fork is still in works
+version = '1.0.0-RELEASE'
 
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 repositories {
     mavenCentral()

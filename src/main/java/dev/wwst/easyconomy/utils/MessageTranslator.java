@@ -39,13 +39,13 @@ public class MessageTranslator {
 
         saveDefaults();
 
-        String filename = "plugins/EasyConomy/messages_"+language+".yml";
-        File languageFile = new File(filename);
+        String filename = "messages_" + language + ".yml";
+        File languageFile = new File(invokingPlugin.getDataFolder(), filename);
         if(!languageFile.exists()) {
             plugin.getLogger().severe("!!! The language chosen by you, "+language+", cannot be resolved!");
             plugin.getLogger().severe("!!! Create a file called messages_"+language+".yml in the EasyConomy folder to start!");
             plugin.getLogger().severe("!!! For now, the ENGLISH language file will be loaded!");
-            languageFile = new File("plugins/EasyConomy/messages_en.yml");
+            languageFile = new File(invokingPlugin.getDataFolder(), "messages_en.yml");
         }
         cfg = YamlConfiguration.loadConfiguration(languageFile);
         Map<String, Object> values = cfg.getValues(true);

@@ -1,16 +1,32 @@
-This branch is the production version of what is used on the `mc.geolykt.de` server (it's still in early works, so chances are that it's not up right now).
-It includes several changes to optimize the plugin, remove static abuse and to make it more compatible with other plugins. In short it adds more compact storage files and bank support.
-However due to this, this is not a drop-in replacement for the upstream plugin and cannot be used interchangeably.
+# EasyConomyAdvanced
 
-# EasyConomy
-EasyConomy is an economy plugin that integrates into Vault and focusses about a small selection of core features.
+## About
+This is a production-grade for of the EasyConomy plugin that has more features than the parent project as well as having a no-tolerance bug policy, if you find a bug report it so it can be dealt with accordingly.
+It was originally developed for the `mc.geolykt.de` server but now also contains features meant for the general user, however due to multiple reasons is incompatible with the parent plugin if you are using it's yaml storage format. (It can be converted rather easily though - so if you want to switch - just ask me).
 
 ## Features
+The main policy of the plugin is that it only includes core economy features.
 * Easy setup (Drag plugin in and reload)
-* Easy To Use (/money, /eco give/take/set, /pay AND THAT'S IT)
+* Easy To Use (/money, /eco give/take/set/backup, /pay & /baltop)
 * Perfect for first-time users
 * All messages customizable
 * All settings customizable
+
+The goal is to take the plugin and implementing more advaced options.
+Our changes:
+* Bleeding-edge V2 reading compliance for the binary storage format
+* Concurrency-safe
+* Backups are asynchronous
+* Allow to run command prompt commands when doing backups (allows to compress, ship to offsite, etc them)
+* Banks are implemented
+* Force-uses banks for invalid playernames (-> sort-of fixed unsighly baltops)
+* Bundling FIO operations
+* No static abuse
+* Updated to Java 11
+
+## Why NOT use the fork?
+* It makes use of Java 11 - if you don't have it it won't run.
+* This allows for unsafe commandline operations - don't give anyone write acess to the config file!
 
 ## Dependencies
 * A Bukkit/Spigot/Paper server with 1.16 or above
