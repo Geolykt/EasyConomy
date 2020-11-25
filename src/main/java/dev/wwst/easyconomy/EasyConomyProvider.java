@@ -1,5 +1,8 @@
 package dev.wwst.easyconomy;
 
+import dev.wwst.easyconomy.eco.Account;
+import dev.wwst.easyconomy.eco.Bank;
+import dev.wwst.easyconomy.eco.PlaceholderBank;
 import dev.wwst.easyconomy.storage.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -365,7 +368,12 @@ public class EasyConomyProvider implements Economy {
     @NotNull
     public EconomyResponse depositPlayer(@NotNull String playerName, double amount) {
         if (INVALID_PLAYERNAME.matcher(playerName).find()) {
-            return bankDeposit(playerName, amount);
+            if (!bankPDS.isAccountExisting(playerName)) {
+                bankPDS.addAccount(new PlaceholderBank(playerName, amount));
+                return new EconomyResponse(amount, amount, EconomyResponse.ResponseType.SUCCESS, null);
+            } else {
+                return bankDeposit(playerName, amount);
+            }
         } else {
             return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount);
         }
@@ -466,7 +474,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse deleteBank(@NotNull String name) {
-        Account bank = bankPDS.removeAccount(name);
+        Bank bank = bankPDS.removeAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -483,7 +491,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse bankBalance(@NotNull String name) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -501,7 +509,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse bankHas(@NotNull String name, double amount) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -523,7 +531,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse bankWithdraw(@NotNull String name, double amount) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -531,7 +539,7 @@ public class EasyConomyProvider implements Economy {
         if(logger != null)
             logger.info("[BANK-TRANSFER] "+ name +" "+format(-amount));
         bank.removeMoney(amount);
-        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.FAILURE, null);
+        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -544,7 +552,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse bankDeposit(@NotNull String name, double amount) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -552,7 +560,7 @@ public class EasyConomyProvider implements Economy {
         if(logger != null)
             logger.info("[BANK-TRANSFER] "+ name +" "+format(amount));
         bank.addMoney(amount);
-        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.FAILURE, null);
+        return new EconomyResponse(amount, bank.getMoney(), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
     /**
@@ -563,7 +571,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse isBankOwner(@NotNull String name, @NotNull String playerName) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");
@@ -584,7 +592,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public EconomyResponse isBankOwner(@NotNull String name, @NotNull OfflinePlayer player) {
-        Account bank = bankPDS.getAccount(name);
+        Bank bank = bankPDS.getAccount(name);
         if (bank == null) {
             return new EconomyResponse(0, 0,
                     EconomyResponse.ResponseType.FAILURE, "Bank doesn't exist.");

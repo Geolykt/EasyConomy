@@ -9,6 +9,7 @@ import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -101,6 +102,8 @@ public final class Easyconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getLogger().info("EasyConomy advanced is a fork that is maintained by Geolykt. "
+                + "Do not bother Weiiswurst about any help for this and ask tristellar#9022 / Geolykt instead.");
         if (!isLoaded) {
             return;
         }

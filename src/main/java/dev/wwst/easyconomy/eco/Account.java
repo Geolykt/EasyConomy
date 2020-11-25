@@ -1,9 +1,7 @@
-package dev.wwst.easyconomy.storage;
+package dev.wwst.easyconomy.eco;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -15,7 +13,7 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Account {
+public class Account implements Bank {
 
     private final Set<UUID> memberUUIDs;
     private final String name;
@@ -30,40 +28,43 @@ public class Account {
         memberUUIDs = members == null ? new HashSet<>() : members;
     }
 
-    public void addMoney(double amount) {
-        // BigDecimal for less approximations when dealing with doubles (due to how floating point values are handled in
-        // Java, there will always be approximations) ( https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html )
-        final double newBalance = BigDecimal.valueOf(bal).subtract(BigDecimal.valueOf(amount)).doubleValue();
-        bal = newBalance;
-    }
-
-    public void removeMoney(double amount) {
-        // BigDecimal for less approximations when dealing with doubles (due to how floating point values are handled in
-        // Java, there will always be approximations) ( https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html )
-        final double newBalance = BigDecimal.valueOf(bal).add(BigDecimal.valueOf(amount)).doubleValue();
-        bal = newBalance;
-    }
-
+    @Override
     public void setMoney(double amount) {
         bal = amount;
     }
 
+    @Override
     public double getMoney() {
         return bal;
     }
 
+    /**
+     * Warning: unofficial API.
+     * Warning: removing all players may result in the Bank being converted to a {@link PlaceholderBank}!
+     * Removes a given player from the memberlist
+     * @param member The member to remove
+     * @return True if the player was removed because it was on the list, false otherwise.
+     */
     public boolean removeMember(@NotNull UUID member) {
         return memberUUIDs.remove(member);
     }
 
+    /**
+     * Warning: unofficial API.
+     * Adds a given player to the memberlist
+     * @param member The member to add
+     * @return True if the player was added because it wasn't already on the list, false otherwise.
+     */
     public boolean addMember(@NotNull UUID member) {
         return memberUUIDs.add(member);
     }
 
+    @Override
     public boolean isMember(@NotNull UUID user) {
         return memberUUIDs.contains(user);
     }
 
+    @Override
     public boolean isMember(@NotNull String playerName) {
         @SuppressWarnings("deprecation")
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
@@ -91,6 +92,7 @@ public class Account {
     // NAME is encoded in UTF-8 and STRLEN is the length of the byte array of NAME, as such
     // NAME may never be longer than 127 bytes.
 
+    @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
         byte[] nameCstr = name.getBytes(StandardCharsets.UTF_8); // The c-string representation of the name
         int headerval = memberUUIDs.size()*16 + 9 + nameCstr.length;
@@ -103,28 +105,5 @@ public class Account {
             buff.putLong(id.getMostSignificantBits()).putLong(id.getLeastSignificantBits());
         }
         out.write(buff.array());
-    }
-
-    @NotNull
-    public static Account deserialize(@NotNull InputStream input) throws IOException {
-        byte[] data = new byte[4];
-        if (input.read(data) == -1) {
-            return null;
-        }
-        data = new byte[ByteBuffer.wrap(data).getInt()];
-        input.read(data);
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-
-        byte[] cstrName = new byte[buffer.get()];
-        buffer.get(cstrName);
-        String name = new String(cstrName, StandardCharsets.UTF_8);
-
-        double money = buffer.getDouble();
-
-        HashSet<UUID> members = new HashSet<>();
-        while (buffer.hasRemaining()) {
-            members.add(new UUID(buffer.getLong(), buffer.getLong()));
-        }
-        return new Account(name, money, members);
     }
 }

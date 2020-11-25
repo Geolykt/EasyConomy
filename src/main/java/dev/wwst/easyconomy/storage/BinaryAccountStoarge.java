@@ -4,13 +4,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.io.Files;
 
 import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.eco.Account;
+import dev.wwst.easyconomy.eco.Bank;
+import dev.wwst.easyconomy.eco.PlaceholderBank;
 
 /**
  * Binary adapters for Bank storage.
@@ -28,7 +36,7 @@ public class BinaryAccountStoarge implements Saveable {
     private boolean modified; // Used so the instance doesn't save unnessary amount of times.
 
     private final File storageLoc;
-    private final Map<String, Account> accounts = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Bank> accounts = Collections.synchronizedMap(new HashMap<>());
     private final Logger logger;
 
     public BinaryAccountStoarge(@NotNull String path, @NotNull Easyconomy plugin) throws IOException {
@@ -42,13 +50,13 @@ public class BinaryAccountStoarge implements Saveable {
         logger = plugin.getLogger();
     }
 
-    public void addAccount(@NotNull Account acc) {
+    public void addAccount(@NotNull Bank acc) {
         accounts.put(acc.getName(), acc);
         modified = true;
     }
 
     @Nullable
-    public Account getAccount(@NotNull String name) {
+    public Bank getAccount(@NotNull String name) {
         modified = true; // We have to assume that it was modified since the returning account instance could be modified.
         return accounts.get(name);
     }
@@ -58,7 +66,7 @@ public class BinaryAccountStoarge implements Saveable {
      * @param acc The account to add
      * @return True if the account was already added, false otherwise
      */
-    public boolean addIfAbsent(@NotNull Account acc) {
+    public boolean addIfAbsent(@NotNull Bank acc) {
         modified = true;
         return accounts.putIfAbsent(acc.getName(), acc) != null;
     }
@@ -74,7 +82,7 @@ public class BinaryAccountStoarge implements Saveable {
                 synchronized (BinaryAccountStoarge.class) {
                     long time = System.currentTimeMillis();
                     try (FileOutputStream ioStream = new FileOutputStream(storageLoc)) {
-                        for (Map.Entry<String, Account> acc : accounts.entrySet()) {
+                        for (Map.Entry<String, Bank> acc : accounts.entrySet()) {
                             acc.getValue().serialize(ioStream);
                         }
                     }
@@ -85,12 +93,38 @@ public class BinaryAccountStoarge implements Saveable {
         }
     }
 
+    @Nullable
+    private static Bank deserializeBank(@NotNull InputStream ioStream) throws IOException {
+        byte[] data = new byte[4];
+        if (ioStream.read(data) == -1) {
+            return null;
+        }
+        data = new byte[ByteBuffer.wrap(data).getInt()];
+        ioStream.read(data);
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+
+        byte[] cstrName = new byte[buffer.get()];
+        buffer.get(cstrName);
+        String name = new String(cstrName, StandardCharsets.UTF_8);
+        double money = buffer.getDouble();
+
+        if (!buffer.hasRemaining()) {
+            return new PlaceholderBank(name, money);
+        } else {
+            HashSet<UUID> members = new HashSet<>();
+            while (buffer.hasRemaining()) {
+                members.add(new UUID(buffer.getLong(), buffer.getLong()));
+            }
+            return new Account(name, money, members);
+        }
+    }
+
     public void reload() throws IOException {
         try (FileInputStream ioStream = new FileInputStream(storageLoc)) {
             accounts.clear();
             while (true) {
-                Account acc = Account.deserialize(ioStream);
-                if (acc == null) {
+                Bank acc = deserializeBank(ioStream);
+                if (acc == null) { // returns null if the stream is closed.
                     break;
                 }
                 accounts.put(acc.getName(), acc);
@@ -119,7 +153,7 @@ public class BinaryAccountStoarge implements Saveable {
         return isAccountExisting(name) ? getAccount(name).getMoney() : 0.0;
     }
 
-    public Account removeAccount(@NotNull String name) {
+    public Bank removeAccount(@NotNull String name) {
         modified = true;
         return accounts.remove(name);
     }

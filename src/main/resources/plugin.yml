@@ -3,7 +3,7 @@ version: @version@
 main: dev.wwst.easyconomy.Easyconomy
 api-version: "1.16"
 softdepend: [Vault]
-authors: [Weiiswurst]
+authors: [Weiiswurst, Geolykt]
 description: Easy economy management
 loadbefore: [Essentials]
 
