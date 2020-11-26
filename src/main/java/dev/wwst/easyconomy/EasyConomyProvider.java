@@ -76,7 +76,7 @@ public class EasyConomyProvider implements Economy {
      */
     @Override
     public boolean isEnabled() {
-        return Bukkit.getPluginManager().isPluginEnabled("EasyConomy");
+        return Bukkit.getPluginManager().isPluginEnabled("EasyConomy"); // FIXME magic constant
     }
 
     /**
@@ -87,7 +87,7 @@ public class EasyConomyProvider implements Economy {
     @Override
     @NotNull
     public String getName() {
-        return "EasyConomy";
+        return "EasyConomyAdvanced";
     }
 
     /**
@@ -694,5 +694,35 @@ public class EasyConomyProvider implements Economy {
     @Override
     public boolean createPlayerAccount(@NotNull OfflinePlayer player, @NotNull String worldName) {
         return createPlayerAccount(player);
+    }
+
+    /**
+     * Sets the balance of a bank account to a given number.
+     *  Does not create a new bank account and safely returns false if there is none.
+     * @param bank The bank account that needs to be affected.
+     * @param amount The new bank balance
+     * @return True if the bank existed, false otherwise
+     */
+    public boolean setBankBalance(@NotNull String bank, double amount) {
+        if (!bankPDS.isAccountExisting(bank)) {
+            return false;
+        }
+        bankPDS.getAccount(bank).setMoney(amount);
+        return true;
+    }
+
+    /**
+     * Sets the balance of a player to a given number.
+     *  Does not create a new player balance and safely returns false if there is none.
+     * @param player The player that needs to be affected.
+     * @param amount The new balance of the player's balance
+     * @return True if the player balance existed, false otherwise
+     */
+    public boolean setPlayerBalance(@NotNull OfflinePlayer player, double amount) {
+        if (!playerPDS.has(player.getUniqueId())) {
+            return false;
+        }
+        playerPDS.write(player.getUniqueId(), amount);
+        return true;
     }
 }

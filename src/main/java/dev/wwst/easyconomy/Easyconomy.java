@@ -3,13 +3,14 @@ package dev.wwst.easyconomy;
 import dev.wwst.easyconomy.commands.BalanceCommand;
 import dev.wwst.easyconomy.commands.BaltopCommand;
 import dev.wwst.easyconomy.commands.EcoCommand;
+import dev.wwst.easyconomy.commands.GivemoneyCommand;
 import dev.wwst.easyconomy.commands.PayCommand;
+import dev.wwst.easyconomy.commands.SetmoneyCommand;
 import dev.wwst.easyconomy.events.JoinEvent;
 import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
@@ -32,8 +33,6 @@ public final class Easyconomy extends JavaPlugin {
 
     private EasyConomyProvider ecp;
     private MessageTranslator translator;
-
-    public static final String PLUGIN_NAME = "EasyConomy";
 
     private void handleConfigUpdateing() {
         switch (getConfig().getInt("CONFIG_VERSION_NEVER_CHANGE_THIS")) {
@@ -133,10 +132,25 @@ public final class Easyconomy extends JavaPlugin {
         getCommand("baltop").setPermission(perm);
         getCommand("baltop").setPermissionMessage(translator.getMessageAndReplace("general.noPerms", true, perm));
 
+        perm = getConfig().getString("permissions.modify", null);
+        if ("".equals(perm)) {
+            perm = "op";
+        }
+        String permessage = translator.getMessageAndReplace("general.noPerms", true, perm);
+        getCommand("givemoney").setPermission(perm);
+        getCommand("givemoney").setPermissionMessage(permessage);
+        getCommand("takemoney").setPermission(perm);
+        getCommand("takemoney").setPermissionMessage(permessage);
+        getCommand("setmoney").setPermission(perm);
+        getCommand("setmoney").setPermissionMessage(permessage);
+
         getCommand("balance").setExecutor(new BalanceCommand(ecp, translator, this));
         getCommand("eco").setExecutor(new EcoCommand(ecp, translator, this, backupFolder));
         getCommand("pay").setExecutor(new PayCommand(ecp, translator, this));
         getCommand("baltop").setExecutor(new BaltopCommand(ecp, translator));
+        getCommand("givemoney").setExecutor(new GivemoneyCommand(ecp, translator, false));
+        getCommand("takemoney").setExecutor(new GivemoneyCommand(ecp, translator, true));
+        getCommand("setmoney").setExecutor(new SetmoneyCommand(ecp, translator));
 
         if (getConfig().getInt("startingBalance") != 0) {
             Bukkit.getPluginManager().registerEvents(new JoinEvent(ecp, this),this);

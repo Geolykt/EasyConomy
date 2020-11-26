@@ -3,7 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'java'
 
 group = 'de.geolykt'
-version = '1.0.1'
+version = '1.0.2'
 
 sourceCompatibility = '11'
 targetCompatibility = '11'
@@ -24,4 +24,8 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
     }
+}
+
+jar {
+    baseName 'EasyconomyAdvanced'
 }

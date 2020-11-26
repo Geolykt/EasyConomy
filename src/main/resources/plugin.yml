@@ -16,12 +16,9 @@ commands:
       - money
   eco:
     description: "Manage the economy"
-    syntax: "/eco <give|take|set> <player> <amount>"
+    syntax: "/eco <give|take|set|backup> <player> <amount>"
     aliases:
-      - addmoney
-      - givemoney
-      - removemoney
-      - takemoney
+      - economy
       - setbalance
       - setmoney
   pay:
@@ -38,3 +35,19 @@ commands:
       - balancetop
       - topbal
       - topbalance
+  givemoney:
+    description: "Gives the player a specific amount of money"
+    syntax: "/givemoney <player> <amount>"
+    aliases:
+      - addmoney
+  takemoney:
+    description: "Gives a specific amount of money from a player"
+    syntax: "/takemoney <player> <amount>"
+    aliases:
+      - removemoney
+  setmoney:
+    description: "Sets the amount of money of a given player"
+    syntax: "/setmoney <player> <amount>"
+    aliases:
+      - setbalance
+      - setbal
