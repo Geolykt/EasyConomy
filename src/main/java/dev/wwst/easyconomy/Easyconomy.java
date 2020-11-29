@@ -103,12 +103,12 @@ public final class Easyconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("EasyConomy advanced is a fork that is maintained by Geolykt. "
+        getLogger().info("EasyConomyAdvanced is a fork that is maintained by Geolykt. "
                 + "Do not bother Weiiswurst about any help for this and ask tristellar#9022 / Geolykt instead.");
         if (!isLoaded) {
             return;
         }
-        File backupFolder = new File(ecp.getStorage().getStorageFile().getParentFile().getParentFile(), "backups");
+        File backupFolder = new File(ecp.getPlayerDataStorage().getStorageFile().getParentFile().getParentFile(), "backups");
         backupFolder.mkdir();
         handleConfigUpdateing();
         translator = new MessageTranslator(getConfig().getString("language"), this);

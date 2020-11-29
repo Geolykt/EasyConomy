@@ -10,11 +10,23 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Weiiswurst
+ * @author Weiiswurst, Geolykt
+ * @since 1.1.0
  */
 public interface PlayerDataStorage extends Saveable {
 
     public double getPlayerData(@NotNull OfflinePlayer p);
+
+    /**
+     * Returns the player balance or a given default if the player does not exist.
+     *  Does not created a balance.
+     * @param player The player to query
+     * @param defaultValue the amount to return if the player is not known to the implementation yet.
+     * @return The balance of the player, or the specified default value
+     * @implNote The implementation should be thread safe.
+     * @since 1.1.0
+     */
+    public double getPlayerDataOrDefault(@NotNull OfflinePlayer player, double defaultValue);
 
     public double getPlayerData(@NotNull UUID player);
 

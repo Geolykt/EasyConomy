@@ -23,7 +23,7 @@ public class BaltopCommand implements CommandExecutor {
     public BaltopCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator) {
         msg = translator;
         eco = economy;
-        pds = economy.getStorage();
+        pds = economy.getPlayerDataStorage();
     }
 
     @Override

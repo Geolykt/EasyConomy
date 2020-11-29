@@ -77,12 +77,17 @@ public class BinaryDataStorage implements PlayerDataStorage {
 
     @Override
     public double getPlayerData(@NotNull OfflinePlayer player) {
-        return balances.getOrDefault(player.getUniqueId(), 0.0);
+        return balances.getOrDefault(player.getUniqueId(), 0.0); // FIXME this isn't even the default in most cases!
+    }
+
+    @Override
+    public double getPlayerDataOrDefault(@NotNull OfflinePlayer player, double defaultValue) {
+        return balances.getOrDefault(player.getUniqueId(), defaultValue);
     }
 
     @Override
     public double getPlayerData(@NotNull UUID player) {
-        return balances.getOrDefault(player, 0.0);
+        return balances.getOrDefault(player, 0.0); // FIXME this isn't even the default in most cases!
     }
 
     @Override

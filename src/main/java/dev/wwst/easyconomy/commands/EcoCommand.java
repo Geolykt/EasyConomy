@@ -36,7 +36,7 @@ public class EcoCommand implements CommandExecutor {
 
     public EcoCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
         this.eco = economy;
-        this.balanceFile = economy.getStorage();
+        this.balanceFile = economy.getPlayerDataStorage();
         this.bankFile = economy.getBankStorage();
         this.msg = translator;
         this.version = invokingPlugin.getDescription().getVersion();

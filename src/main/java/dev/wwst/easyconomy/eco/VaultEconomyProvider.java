@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import de.geolykt.easyconomy.api.Bank;
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.PlayerDataStorage;
 import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
@@ -34,7 +35,7 @@ import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
  * @author Weiiswurst, Geolykt
  * @since 1.1.0
  */
-public class VaultEconomyProvider implements Economy {
+public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
 
     private final PlayerDataStorage playerPDS;
     private final BinaryAccountStoarge bankPDS;
@@ -68,16 +69,6 @@ public class VaultEconomyProvider implements Economy {
         currencyFormatSingular = ChatColor.translateAlternateColorCodes('&',config.getString("names.currencyFormatSingular", "%s Dollar"));
         currencyFormatPlural = ChatColor.translateAlternateColorCodes('&',config.getString("names.currencyFormatPlural","%s Dollars"));
         fractionalDigits = config.getInt("decimalsShown");
-    }
-
-    @NotNull
-    public PlayerDataStorage getStorage() {
-        return playerPDS;
-    }
-
-    @NotNull
-    public BinaryAccountStoarge getBankStorage() {
-        return bankPDS;
     }
 
     /**
@@ -735,5 +726,67 @@ public class VaultEconomyProvider implements Economy {
         }
         playerPDS.write(player.getUniqueId(), amount);
         return true;
+    }
+
+    @Override
+    public @NotNull PlayerDataStorage getPlayerDataStorage() {
+        return playerPDS;
+    }
+
+    @Override
+    public @NotNull BinaryAccountStoarge getBankStorage() {
+        return bankPDS;
+    }
+
+    @Override
+    public double givePlayerMoney(@NotNull OfflinePlayer player, double amount) {
+        return depositPlayer(player, amount).balance;
+    }
+
+    @Override
+    public double removePlayerMoney(@NotNull OfflinePlayer player, double amount) {
+        return withdrawPlayer(player, amount).balance;
+    }
+
+    @Override
+    public @Nullable Bank getBank(@NotNull String name) {
+        return bankPDS.getAccount(name);
+    }
+
+    @Override
+    public boolean createBank(@NotNull String name) {
+        if (bankPDS.isAccountExisting(name)) {
+            bankPDS.addAccount(new PlaceholderBank(name, 0.0));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isPlayerExisting(@NotNull OfflinePlayer player) {
+        return playerPDS.has(player.getUniqueId());
+    }
+
+    @Override
+    public boolean createPlayer(@NotNull OfflinePlayer player) {
+        return createPlayerAccount(player);
+    }
+
+    @Override
+    public double setBalance(@NotNull OfflinePlayer player, double amount) {
+        double old = playerPDS.getPlayerData(player); // FIXME does not account for defaults!
+        playerPDS.write(player.getUniqueId(), amount);
+        return old;
+    }
+
+    @Override
+    public double setBalance(@NotNull String bank, double amount) {
+        Bank bankObj = bankPDS.getAccount(bank);
+        if (bankObj != null) {
+            double old = bankObj.getMoney();
+            bankObj.setMoney(amount);
+            return old;
+        }
+        return Double.MIN_VALUE;
     }
 }
