@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.1.0
  */
 public interface PlayerDataStorage extends Saveable {
-
-    public double getPlayerData(@NotNull OfflinePlayer p);
 
     /**
      * Returns the player balance or a given default if the player does not exist.
@@ -26,14 +23,26 @@ public interface PlayerDataStorage extends Saveable {
      * @implNote The implementation should be thread safe.
      * @since 1.1.0
      */
-    public double getPlayerDataOrDefault(@NotNull OfflinePlayer player, double defaultValue);
+    public double getPlayerDataOrDefault(@NotNull UUID player, double defaultValue);
 
     public double getPlayerData(@NotNull UUID player);
 
     public @NotNull List<UUID> getAllData();
 
+    /**
+     * Sets the balance of a player
+     * @param key The player that should be the target of the operation
+     * @param value The new balance of the player
+     * @implNote As always, this should be thread safe
+     * @since 1.1.0
+     */
     public void write(@NotNull UUID key, double value);
 
+    /**
+     * Reloads the data from file
+     * @implNote This should be thread safe, but may block
+     * @since 1.1.0
+     */
     public void reload();
 
     public @NotNull Map<UUID, Double> getBaltop();

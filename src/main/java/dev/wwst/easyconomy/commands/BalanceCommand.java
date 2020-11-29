@@ -40,7 +40,7 @@ public class BalanceCommand implements CommandExecutor {
 
         Player p = (Player) sender;
         if(args.length == 0) {
-            p.sendMessage(msg.getMessageAndReplace("balance.ofSelf", true, eco.format(eco.getPlayerBalance(p))));
+            p.sendMessage(msg.getMessageAndReplace("balance.ofSelf", true, eco.format(eco.getPlayerBalance(p.getUniqueId()))));
         } else if(args.length == 1) {
             if(!"".equals(permissionOther) && !sender.hasPermission(permissionOther)) {
                 sender.sendMessage(msg.getMessageAndReplace("general.noPerms", true, permissionOther));
@@ -56,10 +56,10 @@ public class BalanceCommand implements CommandExecutor {
     private void sendBalanceOfOther(@NotNull CommandSender sender, @NotNull String otherName) {
         @SuppressWarnings("deprecation")
         OfflinePlayer p = Bukkit.getOfflinePlayer(otherName);
-        if(!p.hasPlayedBefore() || !eco.isPlayerExisting(p)) {
+        if(!p.hasPlayedBefore() || !eco.isPlayerExisting(p.getUniqueId())) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount", true, otherName));
         } else {
-            sender.sendMessage(msg.getMessageAndReplace("balance.ofOther", true, p.getName(), eco.format(eco.getPlayerBalance(p))));
+            sender.sendMessage(msg.getMessageAndReplace("balance.ofOther", true, p.getName(), eco.format(eco.getPlayerBalance(p.getUniqueId()))));
         }
     }
 }

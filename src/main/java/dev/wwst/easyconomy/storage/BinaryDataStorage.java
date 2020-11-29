@@ -17,7 +17,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import com.google.common.io.Files;
@@ -76,13 +75,8 @@ public class BinaryDataStorage implements PlayerDataStorage {
     }
 
     @Override
-    public double getPlayerData(@NotNull OfflinePlayer player) {
-        return balances.getOrDefault(player.getUniqueId(), 0.0); // FIXME this isn't even the default in most cases!
-    }
-
-    @Override
-    public double getPlayerDataOrDefault(@NotNull OfflinePlayer player, double defaultValue) {
-        return balances.getOrDefault(player.getUniqueId(), defaultValue);
+    public double getPlayerDataOrDefault(@NotNull UUID player, double defaultValue) {
+        return balances.getOrDefault(player, defaultValue);
     }
 
     @Override

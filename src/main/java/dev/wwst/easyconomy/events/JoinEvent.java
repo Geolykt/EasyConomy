@@ -22,7 +22,7 @@ public class JoinEvent implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(@NotNull PlayerJoinEvent e) {
-        if (!economy.isPlayerExisting(e.getPlayer())) {
+        if (!economy.isPlayerExisting(e.getPlayer().getUniqueId())) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 final String cmd = "eco give "+e.getPlayer().getName()+" "+plugin.getConfig().getInt("startingBalance");
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),cmd);

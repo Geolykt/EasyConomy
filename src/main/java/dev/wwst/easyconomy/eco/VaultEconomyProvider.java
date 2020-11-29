@@ -226,7 +226,7 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
      */
     @Override
     public double getBalance(@NotNull OfflinePlayer player) {
-        return playerPDS.getPlayerDataOrDefault(player, Double.NEGATIVE_INFINITY);
+        return playerPDS.getPlayerDataOrDefault(player.getUniqueId(), Double.NEGATIVE_INFINITY);
     }
 
     /**
@@ -739,13 +739,23 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
     }
 
     @Override
-    public double givePlayerMoney(@NotNull OfflinePlayer player, double amount) {
-        return depositPlayer(player, amount).balance;
+    public double givePlayerMoney(@NotNull UUID player, double amount) {
+        final double oldBalance = playerPDS.getPlayerDataOrDefault(player, 0.0);
+        final double newBalance = BigDecimal.valueOf(oldBalance).add(BigDecimal.valueOf(amount)).doubleValue();
+        if(logger != null)
+            logger.info("[TRANSFER-ADD] " + player + " " + format(amount));
+        playerPDS.write(player, newBalance);
+        return newBalance;
     }
 
     @Override
-    public double removePlayerMoney(@NotNull OfflinePlayer player, double amount) {
-        return withdrawPlayer(player, amount).balance;
+    public double removePlayerMoney(@NotNull UUID player, double amount) {
+        final double oldBalance = playerPDS.getPlayerDataOrDefault(player, 0.0);
+        final double newBalance = BigDecimal.valueOf(oldBalance).subtract(BigDecimal.valueOf(amount)).doubleValue();
+        if(logger != null)
+            logger.info("[TRANSFER-DEL] " + player + " " + format(amount));
+        playerPDS.write(player, newBalance);
+        return newBalance;
     }
 
     @Override
@@ -763,19 +773,23 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
     }
 
     @Override
-    public boolean isPlayerExisting(@NotNull OfflinePlayer player) {
-        return playerPDS.has(player.getUniqueId());
+    public boolean isPlayerExisting(@NotNull UUID player) {
+        return playerPDS.has(player);
     }
 
     @Override
-    public boolean createPlayer(@NotNull OfflinePlayer player) {
-        return createPlayerAccount(player);
+    public boolean createPlayer(@NotNull UUID player) {
+        if (playerPDS.has(player)) {
+            return false;
+        }
+        playerPDS.write(player, 0.0); // FIXME not the default money!
+        return true;
     }
 
     @Override
-    public double setBalance(@NotNull OfflinePlayer player, double amount) {
+    public double setBalance(@NotNull UUID player, double amount) {
         double old = playerPDS.getPlayerData(player); // FIXME does not account for defaults!
-        playerPDS.write(player.getUniqueId(), amount);
+        playerPDS.write(player, amount);
         return old;
     }
 
@@ -791,7 +805,7 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
     }
 
     @Override
-    public double getPlayerBalance(@NotNull OfflinePlayer player) {
+    public double getPlayerBalance(@NotNull UUID player) {
         return playerPDS.getPlayerDataOrDefault(player, Double.NEGATIVE_INFINITY);
     }
 

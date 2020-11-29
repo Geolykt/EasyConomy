@@ -54,20 +54,20 @@ public class PayCommand implements CommandExecutor {
             sender.sendMessage(msg.getMessage("pay.self",true));
             return true;
         }
-        if(eco.getPlayerBalance(p) < amount) {
-            sender.sendMessage(msg.getMessageAndReplace("general.insufficientFunds",true,eco.format(amount-eco.getPlayerBalance(p))));
+        if(eco.getPlayerBalance(p.getUniqueId()) < amount) {
+            sender.sendMessage(msg.getMessageAndReplace("general.insufficientFunds",true,eco.format(amount-eco.getPlayerBalance(p.getUniqueId()))));
             return true;
         }
         @SuppressWarnings("deprecation")
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-        if(!eco.isPlayerExisting(target)) {
+        if(!eco.isPlayerExisting(target.getUniqueId())) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,args[0]));
             return true;
         }
-        eco.transferBalance(p, target, amount);
-        p.sendMessage(msg.getMessageAndReplace("pay.you",true,target.getName(),eco.format(amount),eco.format(eco.getPlayerBalance(p))));
+        eco.transferBalance(p.getUniqueId(), target.getUniqueId(), amount);
+        p.sendMessage(msg.getMessageAndReplace("pay.you",true,target.getName(),eco.format(amount),eco.format(eco.getPlayerBalance(p.getUniqueId()))));
         if(target.getPlayer() != null) {
-            target.getPlayer().sendMessage(msg.getMessageAndReplace("pay.target", true, p.getName(), eco.format(amount), eco.format(eco.getPlayerBalance(target))));
+            target.getPlayer().sendMessage(msg.getMessageAndReplace("pay.target", true, p.getName(), eco.format(amount), eco.format(eco.getPlayerBalance(target.getUniqueId()))));
         }
         return true;
     }

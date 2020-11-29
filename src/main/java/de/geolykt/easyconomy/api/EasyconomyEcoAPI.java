@@ -1,6 +1,7 @@
 package de.geolykt.easyconomy.api;
 
-import org.bukkit.OfflinePlayer;
+import java.util.UUID;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double givePlayerMoney(@NotNull OfflinePlayer player, double amount);
+    public double givePlayerMoney(@NotNull UUID player, double amount);
 
     /**
      * Removes money from the balance of a player, the implementation can create a new player account if needed but should
@@ -51,7 +52,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double removePlayerMoney(@NotNull OfflinePlayer player, double amount);
+    public double removePlayerMoney(@NotNull UUID player, double amount);
 
     /**
      * Deposits money to a bank and returns true if the transfer succeeded, false in case a non-existing bank is the target,
@@ -141,7 +142,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public boolean isPlayerExisting(@NotNull OfflinePlayer player);
+    public boolean isPlayerExisting(@NotNull UUID player);
 
     /**
      * Explicitly creates a new balance for a player.
@@ -151,7 +152,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public boolean createPlayer(@NotNull OfflinePlayer player);
+    public boolean createPlayer(@NotNull UUID player);
 
     // Advanced balance manipulation
     /**
@@ -163,7 +164,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double setBalance(@NotNull OfflinePlayer player, double amount);
+    public double setBalance(@NotNull UUID player, double amount);
 
     /**
      * Sets the balance of a bank to a given amount.
@@ -183,7 +184,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double getPlayerBalance(@NotNull OfflinePlayer player);
+    public double getPlayerBalance(@NotNull UUID player);
 
     /**
      * Returns the balance of a bank. It should return Double.NEGATIVE_INFINITY if there is no bank attached to the name.
@@ -204,7 +205,7 @@ public interface EasyconomyEcoAPI {
      * @implSpec The implementation should always be thread safe
      * @since 1.1.0
      */
-    public default double transferBalance(@NotNull OfflinePlayer src, @NotNull OfflinePlayer dest, double amount) {
+    public default double transferBalance(@NotNull UUID src, @NotNull UUID dest, double amount) {
         removePlayerMoney(src, amount);
         givePlayerMoney(dest, amount);
         return amount;

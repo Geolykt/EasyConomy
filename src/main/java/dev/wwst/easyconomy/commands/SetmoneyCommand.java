@@ -47,7 +47,7 @@ public class SetmoneyCommand implements CommandExecutor {
         if (ents.size() == 0) {
             if (economy.setBalance(args[0], amount) == Double.NEGATIVE_INFINITY) {
                 // Set balance of (offline) player instead since there was no given bank balance
-                economy.setBalance(Bukkit.getOfflinePlayer(args[0]), amount);
+                economy.setBalance(Bukkit.getOfflinePlayer(args[0]).getUniqueId(), amount);
             }
             sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                     true,
@@ -58,7 +58,7 @@ public class SetmoneyCommand implements CommandExecutor {
             // Add balance to all selected players
             for (Entity entity : ents) {
                 if (entity instanceof OfflinePlayer) {
-                    economy.setBalance(Bukkit.getOfflinePlayer(args[0]), amount);
+                    economy.setBalance(Bukkit.getOfflinePlayer(args[0]).getUniqueId(), amount);
                     sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                             true,
                             args[0],

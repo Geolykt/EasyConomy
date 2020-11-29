@@ -132,14 +132,14 @@ public class EcoCommand implements CommandExecutor {
         double now = 0.0;
         switch (operation.toLowerCase()) {
             case "add": case "addmoney": case "give": case "givemoney":
-                now = eco.givePlayerMoney(p, amount);
+                now = eco.givePlayerMoney(p.getUniqueId(), amount);
                 break;
             case "remove": case "removemoney": case "take": case "takemoney":
-                now = eco.removePlayerMoney(p,amount);
+                now = eco.removePlayerMoney(p.getUniqueId(),amount);
                 break;
             case "set": case "setbalance": case "setmoney":
                 now = amount;
-                amount = Math.abs(amount - eco.setBalance(p, amount));
+                amount = Math.abs(amount - eco.setBalance(p.getUniqueId(), amount));
                 break;
             default:
                 sender.sendMessage(msg.getMessageAndReplace("general.syntax", true, "/eco give|take|set <playerName> <amount>"));

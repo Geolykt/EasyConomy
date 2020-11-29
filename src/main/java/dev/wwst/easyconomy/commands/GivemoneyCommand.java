@@ -1,6 +1,7 @@
 package dev.wwst.easyconomy.commands;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -64,7 +65,7 @@ public class GivemoneyCommand implements CommandExecutor {
                 }
             } else {
                 // Add balance to (offline) player
-                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
+                UUID player = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
                 if (isTaking) {
                     economy.removePlayerMoney(player, amount);
                     now = economy.getPlayerBalance(player);
@@ -84,11 +85,11 @@ public class GivemoneyCommand implements CommandExecutor {
                 if (entity instanceof OfflinePlayer) {
                     final double now;
                     if (isTaking) {
-                        economy.removePlayerMoney((OfflinePlayer) entity, amount);
-                        now = economy.getPlayerBalance((OfflinePlayer) entity);
+                        economy.removePlayerMoney(entity.getUniqueId(), amount);
+                        now = economy.getPlayerBalance(entity.getUniqueId());
                     } else {
-                        economy.givePlayerMoney((OfflinePlayer) entity, amount);
-                        now = economy.getPlayerBalance((OfflinePlayer) entity);
+                        economy.givePlayerMoney(entity.getUniqueId(), amount);
+                        now = economy.getPlayerBalance(entity.getUniqueId());
                     }
                     sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                             true,
