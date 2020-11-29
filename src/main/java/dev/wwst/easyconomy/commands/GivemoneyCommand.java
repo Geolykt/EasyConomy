@@ -10,13 +10,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import dev.wwst.easyconomy.EasyConomyProvider;
+import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class GivemoneyCommand implements CommandExecutor {
 
-    private final EasyConomyProvider economy;
+    private final VaultEconomyProvider economy;
     private final MessageTranslator msgTranslator;
     private final boolean isTaking;
 
@@ -26,7 +26,7 @@ public class GivemoneyCommand implements CommandExecutor {
      * @param translator The message translator to use
      * @param take True if the executor should perform the takemoney command, false otherwise
      */
-    public GivemoneyCommand(@NotNull EasyConomyProvider eco, @NotNull MessageTranslator translator, boolean take) {
+    public GivemoneyCommand(@NotNull VaultEconomyProvider eco, @NotNull MessageTranslator translator, boolean take) {
         economy = eco;
         msgTranslator = translator;
         isTaking = take;

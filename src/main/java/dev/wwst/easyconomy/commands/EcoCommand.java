@@ -1,9 +1,8 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.EasyConomyProvider;
 import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
-import dev.wwst.easyconomy.storage.PlayerDataStorage;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -21,6 +20,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.PlayerDataStorage;
+
 public class EcoCommand implements CommandExecutor {
 
     private final Economy eco;
@@ -33,7 +34,7 @@ public class EcoCommand implements CommandExecutor {
     private final Easyconomy plugin;
     private final File backupDir;
 
-    public EcoCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
+    public EcoCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
         this.eco = economy;
         this.balanceFile = economy.getStorage();
         this.bankFile = economy.getBankStorage();

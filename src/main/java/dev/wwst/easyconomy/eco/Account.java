@@ -13,6 +13,8 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import de.geolykt.easyconomy.api.Bank;
+
 public class Account implements Bank {
 
     private final Set<UUID> memberUUIDs;

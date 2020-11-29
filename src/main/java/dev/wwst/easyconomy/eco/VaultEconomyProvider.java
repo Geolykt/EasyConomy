@@ -1,19 +1,4 @@
-package dev.wwst.easyconomy;
-
-import dev.wwst.easyconomy.eco.Account;
-import dev.wwst.easyconomy.eco.Bank;
-import dev.wwst.easyconomy.eco.PlaceholderBank;
-import dev.wwst.easyconomy.storage.*;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
-import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+package dev.wwst.easyconomy.eco;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,10 +11,30 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import de.geolykt.easyconomy.api.Bank;
+import de.geolykt.easyconomy.api.PlayerDataStorage;
+import dev.wwst.easyconomy.Easyconomy;
+import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
+import dev.wwst.easyconomy.storage.BinaryDataStorage;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+
 /**
- * @author Weiiswurst
+ * The EasyconomyProvider class is the implementation of the economy used by many plugins.
+ * While mainly the class is accessed via the interface it implements, 
+ * it can also be used directly to perform more complex tasks and act as an API itself.
+ * @author Weiiswurst, Geolykt
+ * @since 1.1.0
  */
-public class EasyConomyProvider implements Economy {
+public class VaultEconomyProvider implements Economy {
 
     private final PlayerDataStorage playerPDS;
     private final BinaryAccountStoarge bankPDS;
@@ -42,7 +47,13 @@ public class EasyConomyProvider implements Economy {
             currencyNamePlural;
     private final int fractionalDigits;
 
-    public EasyConomyProvider(@NotNull FileConfiguration config, @NotNull Easyconomy invokingPlugin) throws IOException {
+    /**
+     * Creates a new instance of the class with the given parameters to load the required dependencies of the plugin
+     * @param config The FileConfiguration to use to get all the configurations that the implementation uses.
+     * @param invokingPlugin
+     * @throws IOException
+     */
+    public VaultEconomyProvider(@NotNull FileConfiguration config, @NotNull Easyconomy invokingPlugin) throws IOException {
         playerPDS = new BinaryDataStorage(invokingPlugin,
                 config.getString("storage-location-player", "balances.dat"), config.getInt("baltopPlayers"));
         bankPDS = new BinaryAccountStoarge(config.getString("storage-location-bank", "banks.dat"), invokingPlugin);

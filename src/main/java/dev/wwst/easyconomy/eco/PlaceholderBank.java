@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.Bank;
+
 public class PlaceholderBank implements Bank {
 
     protected double money;

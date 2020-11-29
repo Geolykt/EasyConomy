@@ -6,8 +6,8 @@ import dev.wwst.easyconomy.commands.EcoCommand;
 import dev.wwst.easyconomy.commands.GivemoneyCommand;
 import dev.wwst.easyconomy.commands.PayCommand;
 import dev.wwst.easyconomy.commands.SetmoneyCommand;
+import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.events.JoinEvent;
-import dev.wwst.easyconomy.storage.Saveable;
 import dev.wwst.easyconomy.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -16,6 +16,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import de.geolykt.easyconomy.api.Saveable;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +33,7 @@ public final class Easyconomy extends JavaPlugin {
 
     private final List<Saveable> toSave = new ArrayList<>();
 
-    private EasyConomyProvider ecp;
+    private VaultEconomyProvider ecp;
     private MessageTranslator translator;
 
     private void handleConfigUpdateing() {
@@ -82,7 +84,7 @@ public final class Easyconomy extends JavaPlugin {
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if(rsp == null) {
             try {
-                ecp = new EasyConomyProvider(getConfig(), this);
+                ecp = new VaultEconomyProvider(getConfig(), this);
             } catch (IOException e) {
                 e.printStackTrace();
                 getLogger().severe("!!! Failed important FIO Operation !!!");
@@ -172,7 +174,7 @@ public final class Easyconomy extends JavaPlugin {
     }
 
     @NotNull
-    public EasyConomyProvider getEcp() {
+    public VaultEconomyProvider getEcp() {
         return ecp;
     }
 }

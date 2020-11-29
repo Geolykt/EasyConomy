@@ -1,4 +1,4 @@
-package dev.wwst.easyconomy.eco;
+package de.geolykt.easyconomy.api;
 
 import java.io.IOException;
 import java.io.OutputStream;

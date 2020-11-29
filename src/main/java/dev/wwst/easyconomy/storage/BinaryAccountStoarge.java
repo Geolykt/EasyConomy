@@ -23,9 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.io.Files;
 
+import de.geolykt.easyconomy.api.Bank;
+import de.geolykt.easyconomy.api.Saveable;
 import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.eco.Account;
-import dev.wwst.easyconomy.eco.Bank;
 import dev.wwst.easyconomy.eco.PlaceholderBank;
 
 /**

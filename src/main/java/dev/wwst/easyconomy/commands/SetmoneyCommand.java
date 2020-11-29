@@ -10,12 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import dev.wwst.easyconomy.EasyConomyProvider;
+import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 
 public class SetmoneyCommand implements CommandExecutor {
 
-    private final EasyConomyProvider economy;
+    private final VaultEconomyProvider economy;
     private final MessageTranslator msgTranslator;
 
     /**
@@ -23,7 +23,7 @@ public class SetmoneyCommand implements CommandExecutor {
      * @param eco The economy object to use
      * @param translator The message translator to use
      */
-    public SetmoneyCommand(@NotNull EasyConomyProvider eco, @NotNull MessageTranslator translator) {
+    public SetmoneyCommand(@NotNull VaultEconomyProvider eco, @NotNull MessageTranslator translator) {
         economy = eco;
         msgTranslator = translator;
     }

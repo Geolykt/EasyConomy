@@ -1,7 +1,6 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.EasyConomyProvider;
-import dev.wwst.easyconomy.storage.PlayerDataStorage;
+import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -9,6 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+
+import de.geolykt.easyconomy.api.PlayerDataStorage;
 
 import java.util.Map;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class BaltopCommand implements CommandExecutor {
     private final PlayerDataStorage pds;
     private final Economy eco;
 
-    public BaltopCommand(@NotNull EasyConomyProvider economy, @NotNull MessageTranslator translator) {
+    public BaltopCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator) {
         msg = translator;
         eco = economy;
         pds = economy.getStorage();

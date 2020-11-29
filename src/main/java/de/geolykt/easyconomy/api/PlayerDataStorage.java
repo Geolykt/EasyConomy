@@ -1,4 +1,4 @@
-package dev.wwst.easyconomy.storage;
+package de.geolykt.easyconomy.api;
 
 import java.io.File;
 import java.io.IOException;
