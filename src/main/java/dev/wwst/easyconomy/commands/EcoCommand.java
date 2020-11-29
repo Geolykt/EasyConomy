@@ -1,11 +1,8 @@
 package dev.wwst.easyconomy.commands;
 
 import dev.wwst.easyconomy.Easyconomy;
-import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
 import dev.wwst.easyconomy.utils.MessageTranslator;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +17,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.PlayerDataStorage;
 
 public class EcoCommand implements CommandExecutor {
 
-    private final Economy eco;
+    private final EasyconomyEcoAPI eco;
     private final PlayerDataStorage balanceFile;
     private final BinaryAccountStoarge bankFile;
     private final MessageTranslator msg;
@@ -34,7 +32,7 @@ public class EcoCommand implements CommandExecutor {
     private final Easyconomy plugin;
     private final File backupDir;
 
-    public EcoCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
+    public EcoCommand(@NotNull EasyconomyEcoAPI economy, @NotNull MessageTranslator translator, @NotNull Easyconomy invokingPlugin, File backupDirectory) {
         this.eco = economy;
         this.balanceFile = economy.getPlayerDataStorage();
         this.bankFile = economy.getBankStorage();
@@ -124,33 +122,30 @@ public class EcoCommand implements CommandExecutor {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,target));
             return true;
         }
-        final double amount;
+        double amount;
         try {
             amount = Double.parseDouble(amountStr);
         } catch(NumberFormatException e) {
             sender.sendMessage(msg.getMessageAndReplace("general.notAnumber",true,amountStr));
             return true;
         }
-        final EconomyResponse res;
+        double now = 0.0;
         switch (operation.toLowerCase()) {
             case "add": case "addmoney": case "give": case "givemoney":
-                res = eco.depositPlayer(p,amount);
+                now = eco.givePlayerMoney(p, amount);
                 break;
             case "remove": case "removemoney": case "take": case "takemoney":
-                res = eco.withdrawPlayer(p,amount);
+                now = eco.removePlayerMoney(p,amount);
                 break;
             case "set": case "setbalance": case "setmoney":
-                eco.withdrawPlayer(p,eco.getBalance(p));
-                res = eco.depositPlayer(p,amount);
+                now = amount;
+                amount = Math.abs(amount - eco.setBalance(p, amount));
                 break;
             default:
-                res = null;
-                break;
+                sender.sendMessage(msg.getMessageAndReplace("general.syntax", true, "/eco give|take|set <playerName> <amount>"));
+                return true;
         }
-        if(res == null)
-            sender.sendMessage(msg.getMessageAndReplace("general.syntax",true,"/eco give|take|set <playerName> <amount>"));
-        else
-            sender.sendMessage(msg.getMessageAndReplace("eco.success",true,p.getName(),eco.format(res.amount),eco.format(res.balance)));
+        sender.sendMessage(msg.getMessageAndReplace("eco.success", true, p.getName(), eco.format(amount), eco.format(now)));
         return true;
     }
 }

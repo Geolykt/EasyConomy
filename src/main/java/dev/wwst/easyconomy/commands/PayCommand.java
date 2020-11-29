@@ -2,7 +2,6 @@ package dev.wwst.easyconomy.commands;
 
 import dev.wwst.easyconomy.Easyconomy;
 import dev.wwst.easyconomy.utils.MessageTranslator;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -11,15 +10,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
+
 public class PayCommand implements CommandExecutor {
 
 
-    private final Economy eco;
+    private final EasyconomyEcoAPI eco;
     private final MessageTranslator msg;
 
     private final double minimumTransactionAmount;
 
-    public PayCommand(@NotNull Economy economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
+    public PayCommand(@NotNull EasyconomyEcoAPI economy, @NotNull MessageTranslator translator, @NotNull Easyconomy plugin) {
         eco = economy;
         msg = translator;
         minimumTransactionAmount = plugin.getConfig().getDouble("minimumTransactionAmount",0.1d);
@@ -53,21 +54,20 @@ public class PayCommand implements CommandExecutor {
             sender.sendMessage(msg.getMessage("pay.self",true));
             return true;
         }
-        if(!eco.has(p,amount)) {
-            sender.sendMessage(msg.getMessageAndReplace("general.insufficientFunds",true,eco.format(amount-eco.getBalance(p))));
+        if(eco.getPlayerBalance(p) < amount) {
+            sender.sendMessage(msg.getMessageAndReplace("general.insufficientFunds",true,eco.format(amount-eco.getPlayerBalance(p))));
             return true;
         }
         @SuppressWarnings("deprecation")
         OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-        if(!eco.hasAccount(target)) {
+        if(!eco.isPlayerExisting(target)) {
             sender.sendMessage(msg.getMessageAndReplace("general.noAccount",true,args[0]));
             return true;
         }
-        eco.withdrawPlayer(p,amount);
-        eco.depositPlayer(target,amount);
-        p.sendMessage(msg.getMessageAndReplace("pay.you",true,target.getName(),eco.format(amount),eco.format(eco.getBalance(p))));
+        eco.transferBalance(p, target, amount);
+        p.sendMessage(msg.getMessageAndReplace("pay.you",true,target.getName(),eco.format(amount),eco.format(eco.getPlayerBalance(p))));
         if(target.getPlayer() != null) {
-            target.getPlayer().sendMessage(msg.getMessageAndReplace("pay.target",true,p.getName(),eco.format(amount),eco.format(eco.getBalance(target))));
+            target.getPlayer().sendMessage(msg.getMessageAndReplace("pay.target", true, p.getName(), eco.format(amount), eco.format(eco.getPlayerBalance(target))));
         }
         return true;
     }

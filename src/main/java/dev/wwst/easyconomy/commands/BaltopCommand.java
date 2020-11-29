@@ -1,14 +1,13 @@
 package dev.wwst.easyconomy.commands;
 
-import dev.wwst.easyconomy.eco.VaultEconomyProvider;
 import dev.wwst.easyconomy.utils.MessageTranslator;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.PlayerDataStorage;
 
 import java.util.Map;
@@ -18,9 +17,9 @@ public class BaltopCommand implements CommandExecutor {
 
     private final MessageTranslator msg;
     private final PlayerDataStorage pds;
-    private final Economy eco;
+    private final EasyconomyEcoAPI eco;
 
-    public BaltopCommand(@NotNull VaultEconomyProvider economy, @NotNull MessageTranslator translator) {
+    public BaltopCommand(@NotNull EasyconomyEcoAPI economy, @NotNull MessageTranslator translator) {
         msg = translator;
         eco = economy;
         pds = economy.getPlayerDataStorage();

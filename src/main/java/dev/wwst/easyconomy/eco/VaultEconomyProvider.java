@@ -226,7 +226,7 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
      */
     @Override
     public double getBalance(@NotNull OfflinePlayer player) {
-        return playerPDS.getPlayerData(player);
+        return playerPDS.getPlayerDataOrDefault(player, Double.NEGATIVE_INFINITY);
     }
 
     /**
@@ -787,6 +787,16 @@ public class VaultEconomyProvider implements Economy, EasyconomyEcoAPI {
             bankObj.setMoney(amount);
             return old;
         }
-        return Double.MIN_VALUE;
+        return Double.NEGATIVE_INFINITY;
+    }
+
+    @Override
+    public double getPlayerBalance(@NotNull OfflinePlayer player) {
+        return playerPDS.getPlayerDataOrDefault(player, Double.NEGATIVE_INFINITY);
+    }
+
+    @Override
+    public double getBankBalance(@NotNull String bank) {
+        return bankPDS.getBalanceOrDefault(bank, Double.NEGATIVE_INFINITY);
     }
 }

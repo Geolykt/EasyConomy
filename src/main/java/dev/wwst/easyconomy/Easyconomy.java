@@ -17,6 +17,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.Saveable;
 
 import java.io.File;
@@ -27,13 +28,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Weiiswurst
+ * @author Weiiswurst, Geolykt
  */
 public final class Easyconomy extends JavaPlugin {
 
     private final List<Saveable> toSave = new ArrayList<>();
 
-    private VaultEconomyProvider ecp;
+    private EasyconomyEcoAPI ecp;
     private MessageTranslator translator;
 
     private void handleConfigUpdateing() {
@@ -91,7 +92,7 @@ public final class Easyconomy extends JavaPlugin {
                 pm.disablePlugin(this);
                 return;
             }
-            Bukkit.getServicesManager().register(Economy.class, ecp,this, ServicePriority.Normal);
+            Bukkit.getServicesManager().register(Economy.class, (Economy) ecp, this, ServicePriority.Normal);
         } else {
             getLogger().severe("!!! YOU ALREADY HAVE AN ECONOMY PLUGIN !!!");
             getLogger().severe(String.format("!!! REMOVE OR DISABLE THE ECONOMY OF %s !!!",rsp.getProvider().getName()));
@@ -174,7 +175,7 @@ public final class Easyconomy extends JavaPlugin {
     }
 
     @NotNull
-    public VaultEconomyProvider getEcp() {
+    public EasyconomyEcoAPI getAPI() {
         return ecp;
     }
 }

@@ -10,13 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import dev.wwst.easyconomy.eco.VaultEconomyProvider;
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import dev.wwst.easyconomy.utils.MessageTranslator;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class GivemoneyCommand implements CommandExecutor {
 
-    private final VaultEconomyProvider economy;
+    private final EasyconomyEcoAPI economy;
     private final MessageTranslator msgTranslator;
     private final boolean isTaking;
 
@@ -26,7 +25,7 @@ public class GivemoneyCommand implements CommandExecutor {
      * @param translator The message translator to use
      * @param take True if the executor should perform the takemoney command, false otherwise
      */
-    public GivemoneyCommand(@NotNull VaultEconomyProvider eco, @NotNull MessageTranslator translator, boolean take) {
+    public GivemoneyCommand(@NotNull EasyconomyEcoAPI eco, @NotNull MessageTranslator translator, boolean take) {
         economy = eco;
         msgTranslator = translator;
         isTaking = take;
@@ -53,42 +52,49 @@ public class GivemoneyCommand implements CommandExecutor {
         }
         List<Entity> ents = Bukkit.selectEntities(sender, args[0]);
         if (ents.size() == 0) {
-            EconomyResponse respone;
+            final double now;
             if (economy.getBankStorage().isAccountExisting(args[0])) {
                 // Add balance to bank account
                 if (isTaking) {
-                    respone = economy.bankWithdraw(args[0], amount);
+                    economy.removeBankMoney(args[0], amount);
+                    now = economy.getBankBalance(args[0]);
                 } else {
-                    respone = economy.bankDeposit(args[0], amount);
+                    economy.giveBankMoney(args[0], amount);
+                    now = economy.getBankBalance(args[0]);
                 }
             } else {
                 // Add balance to (offline) player
+                OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
                 if (isTaking) {
-                    respone = economy.withdrawPlayer(Bukkit.getOfflinePlayer(args[0]), amount);
+                    economy.removePlayerMoney(player, amount);
+                    now = economy.getPlayerBalance(player);
                 } else {
-                    respone = economy.depositPlayer(Bukkit.getOfflinePlayer(args[0]), amount);
+                    economy.givePlayerMoney(player, amount);
+                    now = economy.getPlayerBalance(player);
                 }
             }
             sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                     true,
                     args[0],
-                    economy.format(respone.amount),
-                    economy.format(respone.balance)));
+                    economy.format(amount),
+                    economy.format(now)));
         } else {
             // Add balance to all selected players
             for (Entity entity : ents) {
                 if (entity instanceof OfflinePlayer) {
-                    EconomyResponse respone;
+                    final double now;
                     if (isTaking) {
-                        respone = economy.withdrawPlayer((OfflinePlayer) entity, amount);
+                        economy.removePlayerMoney((OfflinePlayer) entity, amount);
+                        now = economy.getPlayerBalance((OfflinePlayer) entity);
                     } else {
-                        respone = economy.depositPlayer((OfflinePlayer) entity, amount);
+                        economy.givePlayerMoney((OfflinePlayer) entity, amount);
+                        now = economy.getPlayerBalance((OfflinePlayer) entity);
                     }
                     sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                             true,
-                            entity.getName(),
-                            economy.format(respone.amount),
-                            economy.format(respone.balance)));
+                            args[0],
+                            economy.format(amount),
+                            economy.format(now)));
                 }
             }
         }

@@ -10,7 +10,7 @@ import dev.wwst.easyconomy.storage.BinaryAccountStoarge;
  * The API interface of the Easyconomy plugin that can be used by other plugins to perform more complex tasks.
  *  It is also used as a bridge between different Economy APIs so the internal components of the plugin are guaranteed to 
  *  work even in a non-vault environment. All implementations of the interface should be thread safe but may block if needed.
- * @author Geolykt     
+ * @author Geolykt
  * @since 1.1.0
  */
 public interface EasyconomyEcoAPI {
@@ -158,8 +158,8 @@ public interface EasyconomyEcoAPI {
      * Sets the balance of a player to a given amount.
      *  The implementation may create a player is not known.
      * @param player the player to query
-     * @param amount The new balance of the player; Double.MIN_VALUE if the bank wasn't found
-     * @return the old balance of the player
+     * @param amount The new balance of the player
+     * @return the old balance of the player; Double.NEGATIVE_INFINITY if the player isn't known
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
@@ -170,29 +170,29 @@ public interface EasyconomyEcoAPI {
      *  The implementation may create a bank if not found, however default implementations do not.
      * @param bank the bank to query
      * @param amount The new balance of the bank
-     * @return the old balance of the bank; Double.MIN_VALUE if the bank wasn't found
+     * @return the old balance of the bank; Double.NEGATIVE_INFINITY if the bank wasn't found
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
     public double setBalance(@NotNull String bank, double amount);
 
     /**
-     * Sets the balance of a player to a given amount. It should return Double.MIN_VALUE if the player is not known.
+     * Sets the balance of a player to a given amount. It should return Double.NEGATIVE_INFINITY if the player is not known.
      * @param player the player to query
      * @return the balance of the player
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double getBalance(@NotNull OfflinePlayer player);
+    public double getPlayerBalance(@NotNull OfflinePlayer player);
 
     /**
-     * Returns the balance of a bank. It should return Double.MIN_VALUE if there is no bank attached to the name.
+     * Returns the balance of a bank. It should return Double.NEGATIVE_INFINITY if there is no bank attached to the name.
      * @param bank the bank to query
      * @return the balance of the bank
      * @implSpec The implementation should always be thread safe.
      * @since 1.1.0
      */
-    public double getBalance(@NotNull String bank);
+    public double getBankBalance(@NotNull String bank);
 
     /**
      * Transfers a portion of the balance of a Bank to the balance of the other.

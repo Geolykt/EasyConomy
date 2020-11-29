@@ -10,12 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import dev.wwst.easyconomy.eco.VaultEconomyProvider;
+import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import dev.wwst.easyconomy.utils.MessageTranslator;
 
 public class SetmoneyCommand implements CommandExecutor {
 
-    private final VaultEconomyProvider economy;
+    private final EasyconomyEcoAPI economy;
     private final MessageTranslator msgTranslator;
 
     /**
@@ -23,7 +23,7 @@ public class SetmoneyCommand implements CommandExecutor {
      * @param eco The economy object to use
      * @param translator The message translator to use
      */
-    public SetmoneyCommand(@NotNull VaultEconomyProvider eco, @NotNull MessageTranslator translator) {
+    public SetmoneyCommand(@NotNull EasyconomyEcoAPI eco, @NotNull MessageTranslator translator) {
         economy = eco;
         msgTranslator = translator;
     }
@@ -45,9 +45,9 @@ public class SetmoneyCommand implements CommandExecutor {
         }
         List<Entity> ents = Bukkit.selectEntities(sender, args[0]);
         if (ents.size() == 0) {
-            if (!economy.setBankBalance(args[0], amount)) {
+            if (economy.setBalance(args[0], amount) == Double.NEGATIVE_INFINITY) {
                 // Set balance of (offline) player instead since there was no given bank balance
-                economy.setPlayerBalance(Bukkit.getOfflinePlayer(args[0]), amount);
+                economy.setBalance(Bukkit.getOfflinePlayer(args[0]), amount);
             }
             sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                     true,
@@ -58,7 +58,7 @@ public class SetmoneyCommand implements CommandExecutor {
             // Add balance to all selected players
             for (Entity entity : ents) {
                 if (entity instanceof OfflinePlayer) {
-                    economy.setPlayerBalance(Bukkit.getOfflinePlayer(args[0]), amount);
+                    economy.setBalance(Bukkit.getOfflinePlayer(args[0]), amount);
                     sender.sendMessage(msgTranslator.getMessageAndReplace("eco.success",
                             true,
                             args[0],
