@@ -19,8 +19,8 @@ out/
 # JIRA plugin
 atlassian-ide-plugin.xml
 
-# Compiled class file
-*.class
+# Compiled class file as well as the classpath
+*.class*
 
 # Log file
 *.log
@@ -96,13 +96,6 @@ ehthumbs_vista.db
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-# Windows Installer files
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-
 # Windows shortcuts
 *.lnk
 
@@ -123,3 +116,4 @@ run/
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+/target/
