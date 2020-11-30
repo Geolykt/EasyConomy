@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,7 +38,7 @@ public class BinaryDataStorage implements PlayerDataStorage {
 
     private final Easyconomy plugin;
 
-    private Map<UUID, Double> balTop;
+    private LinkedHashMap<UUID, Double> balTop;
     private double smallestBalTop = Double.MAX_VALUE;
     private double lastBackup = 0;
 
@@ -183,15 +184,23 @@ public class BinaryDataStorage implements PlayerDataStorage {
         modified = false;
     }
 
+    /**
+     * Recalculates the balance top by sorting the raw unsorted data which needs to be provided to the function.
+     * @param notSorted The unsorted leaderboard
+     * @param baltopLength The maximum length of the leaderboard
+     * @since 1.1.0
+     * @author Weiiswurst
+     */
     private void recalcBaltop(@NotNull Map<UUID, Double> notSorted, int baltopLength) {
         balTop = notSorted.entrySet().stream()
+                .filter((entry) -> entry.getValue() != 0.0)
                 .sorted((c1, c2) -> -c1.getValue().compareTo(c2.getValue()))
                 .peek(val->{
                     if(val.getValue() < smallestBalTop) smallestBalTop = val.getValue();})
                 .limit(baltopLength)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, HashMap::new));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         if(balTop.size() < baltopLength) {
-            smallestBalTop = Double.MIN_VALUE;
+            smallestBalTop = Double.NEGATIVE_INFINITY;
         }
     }
 
