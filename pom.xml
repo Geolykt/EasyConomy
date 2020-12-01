@@ -10,5 +10,6 @@
     <modules>
         <module>API</module>
         <module>Bukkit</module>
+        <module>Minestom</module>
     </modules>
 </project>

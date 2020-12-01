@@ -1,15 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>easyconomy-bukkit</artifactId>
-    <packaging>jar</packaging>
-
     <parent>
         <groupId>de.geolykt.easyconomy</groupId>
         <artifactId>easyconomy-advanced</artifactId>
         <version>1.1.0</version>
     </parent>
+    <artifactId>easyconomy-minestom</artifactId>
+    <name>Easyconomy Minestom</name>
+    <description>A minestom port of the EasyconomyAdvanced plugin, which is an early attempt at bringing an economy to minestom</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,46 +17,41 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id> <!-- You know what this does, I hope -->
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>jitpack-repo</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>jitpack-repo</id> <!-- Vault -->
-            <url>https://jitpack.io</url>
+            <id>sponge-repo</id>
+            <url>https://repo.spongepowered.org/maven</url>
+        </repository>
+        <repository>
+            <id>authlib-repo</id>
+            <url>https://libraries.minecraft.net</url>
         </repository>
     </repositories>
 
     <dependencies>
-        <!-- Spigot, the API we are building against -->
+        <!-- Minestom, -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
+            <groupId>com.github.Minestom</groupId>
+            <artifactId>Minestom</artifactId>
+            <version>369910aea4</version>
             <scope>provided</scope>
+            <!-- something that bricks maven ... -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                    <artifactId>shrinkwrap-resolver-depchain</artifactId>
+                </exclusion>
+            </exclusions>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
+            <groupId>com.github.Minestom</groupId>
+            <artifactId>Minestom</artifactId>
+            <version>369910aea4</version>
             <scope>provided</scope>
             <type>javadoc</type>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>20.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Vault, for economy transations -->
-        <dependency>
-            <groupId>com.github.MilkBowl</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- ... and lastly our own API -->
