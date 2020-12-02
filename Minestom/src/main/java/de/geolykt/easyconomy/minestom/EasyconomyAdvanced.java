@@ -20,7 +20,6 @@ import de.geolykt.easyconomy.minestom.impl.PlayerDataEngine;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.extensions.Extension;
-import net.minestom.server.permission.BasicPermission;
 import net.minestom.server.utils.time.TimeUnit;
 
 public class EasyconomyAdvanced extends Extension {
@@ -32,6 +31,7 @@ public class EasyconomyAdvanced extends Extension {
     private void saveAll() {
         Set<Saveable> erroringSaveables = new HashSet<>();
         for (Saveable saveable : toSave) {
+            getLogger().info("Saving " + saveable.getClass().getSimpleName() + "...");
             try {
                 saveable.save();
             } catch (IOException e) {
@@ -50,21 +50,24 @@ public class EasyconomyAdvanced extends Extension {
             throw new RuntimeException();
         }
         instance = this;
-        // FIXME Minestom makes use of StorageManager, we should too!
-        File parent = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "easyconomy");
-        parent.mkdir();
-        PlayerDataStorage pds = new PlayerDataEngine(new File(parent, "players.dat"));
-        BankStorageEngine bds = new BankDataEngine(new File(parent, "banks.dat"));
-        economy = new DefaultEconomyProvider(this, pds, bds);
-        addSaveable(bds);
-        addSaveable(pds);
         // TODO provide service
     }
 
     @Override
     public void initialize() {
+        if (economy == null) {
+            // FIXME Minestom makes use of StorageManager, we should too!
+            File parent = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "easyconomy");
+            parent.mkdir();
+            PlayerDataStorage pds = new PlayerDataEngine(new File(parent, "players.dat"));
+            BankStorageEngine bds = new BankDataEngine(new File(parent, "banks.dat"));
+            registerEconomy(new DefaultEconomyProvider(this, pds, bds));
+        }
         // TODO provide commands
-        MinecraftServer.getSchedulerManager().buildTask(this::saveAll).repeat(10, TimeUnit.MINUTE).schedule();
+        MinecraftServer.getSchedulerManager().buildTask(this::saveAll)
+            .repeat(10, TimeUnit.MINUTE)
+            .delay(10, TimeUnit.MINUTE).schedule();
+        MinecraftServer.getSchedulerManager().buildShutdownTask(this::saveAll).schedule();
         MinecraftServer.getConnectionManager()
                 .addPlayerInitialization((Player p) -> getEconomy().createPlayer(p.getUuid()));
         MinecraftServer.getCommandManager().register(new BalanceCommand(this));
@@ -72,8 +75,16 @@ public class EasyconomyAdvanced extends Extension {
     }
 
     @Override
-    public void terminate() {
+    public void postInitialize() {
+        getLogger().info("EasyconomyAdvanced is making use of " + economy.getClass().getSimpleName() 
+                + " as the active economy.");
+    }
+
+    @Override
+    public void preTerminate() {
+        getLogger().info("Saving easyconomy saveables...");
         this.saveAll();
+        toSave.clear();
     }
 
     public void addSaveable(@NotNull Saveable saveable) {
@@ -93,5 +104,10 @@ public class EasyconomyAdvanced extends Extension {
 
     public static @NotNull EasyconomyEcoAPI getEconomy() {
         return instance.economy;
+    }
+
+    @Override
+    public void terminate() {
+        // TODO
     }
 }

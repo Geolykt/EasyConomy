@@ -17,8 +17,8 @@ public class BalanceCommand extends Command {
     public BalanceCommand(EasyconomyAdvanced invokingExtension) {
         super("balance", "bal", "money");
         extension = invokingExtension;
+        this.setDefaultExecutor(this::selfExecution);
         this.addSyntax(this::targettedExecution, ArgumentType.Word("target"));
-        this.addSyntax(this::selfExecution);
     }
 
     public void selfExecution(CommandSender sender, Arguments args) {
