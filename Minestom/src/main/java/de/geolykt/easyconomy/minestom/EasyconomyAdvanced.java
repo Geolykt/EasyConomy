@@ -11,11 +11,16 @@ import de.geolykt.easyconomy.api.BankStorageEngine;
 import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.PlayerDataStorage;
 import de.geolykt.easyconomy.api.Saveable;
+import de.geolykt.easyconomy.minestom.commands.AdministratorPermissions;
+import de.geolykt.easyconomy.minestom.commands.BalanceCommand;
+import de.geolykt.easyconomy.minestom.commands.GivemoneyCommand;
 import de.geolykt.easyconomy.minestom.impl.BankDataEngine;
 import de.geolykt.easyconomy.minestom.impl.DefaultEconomyProvider;
 import de.geolykt.easyconomy.minestom.impl.PlayerDataEngine;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
 import net.minestom.server.extensions.Extension;
+import net.minestom.server.permission.BasicPermission;
 import net.minestom.server.utils.time.TimeUnit;
 
 public class EasyconomyAdvanced extends Extension {
@@ -26,7 +31,7 @@ public class EasyconomyAdvanced extends Extension {
 
     private void saveAll() {
         Set<Saveable> erroringSaveables = new HashSet<>();
-        for(Saveable saveable : toSave) {
+        for (Saveable saveable : toSave) {
             try {
                 saveable.save();
             } catch (IOException e) {
@@ -60,7 +65,10 @@ public class EasyconomyAdvanced extends Extension {
     public void initialize() {
         // TODO provide commands
         MinecraftServer.getSchedulerManager().buildTask(this::saveAll).repeat(10, TimeUnit.MINUTE).schedule();
-        System.out.println("EasyconomyAdvanced loaded sucessfully!");
+        MinecraftServer.getConnectionManager()
+                .addPlayerInitialization((Player p) -> getEconomy().createPlayer(p.getUuid()));
+        MinecraftServer.getCommandManager().register(new BalanceCommand(this));
+        MinecraftServer.getCommandManager().register(new GivemoneyCommand(this, new AdministratorPermissions()));
     }
 
     @Override

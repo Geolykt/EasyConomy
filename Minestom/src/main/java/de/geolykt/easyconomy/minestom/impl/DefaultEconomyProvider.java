@@ -28,7 +28,7 @@ public class DefaultEconomyProvider implements EasyconomyEcoAPI {
     public DefaultEconomyProvider(@NotNull EasyconomyAdvanced extension,
             @NotNull PlayerDataStorage playerStorageEngine,
             @NotNull BankStorageEngine bankStorageEngine) {
-        currencyFormat = "$%0.2f";
+        currencyFormat = "$%.2f";
         playerPDS = playerStorageEngine;
         bankPDS = bankStorageEngine;
     }
