@@ -43,6 +43,7 @@ public class EasyconomyAdvanced extends Extension {
         if (toSave.removeAll(erroringSaveables)) {
             // TODO disable extension?
         }
+        getLogger().info("Saved!");
     }
 
     @Override
@@ -71,14 +72,14 @@ public class EasyconomyAdvanced extends Extension {
                 .addPlayerInitialization((Player p) -> getEconomy().createPlayer(p.getUuid()));
         MinecraftServer.getCommandManager().register(new BalanceCommand(this));
         MinecraftServer.getCommandManager().register(new BaltopCommand(this));
-        // FIXME correct permissions for the commands below
+        // FIXME correct permissions for the commands below - they could be better
         MinecraftServer.getCommandManager().register(new GivemoneyCommand(this, new AdministratorPermissions()));
     }
 
     @Override
     public void postInitialize() {
         getLogger().info("EasyconomyAdvanced is making use of " + economy.getClass().getSimpleName() 
-                + " as the active economy.");
+                + " as the active economy (this may change later in runtime though).");
     }
 
     @Override
@@ -94,8 +95,18 @@ public class EasyconomyAdvanced extends Extension {
         toSave.add(saveable);
     }
 
-    public static void registerEconomy(@NotNull EasyconomyEcoAPI eco) {
+    /**
+     * Registers the new economy and adds it's storage containers to the internal saveables list.
+     * Due to this the implementor doesn't need to bother with automatic saving.
+     * Additionally it saves the old economy, if existing and prints and warning if this occurs.
+     * It is recommended to call this method during the {@link Extension#preInitialize()} phase.
+     * @param eco The new economy to register
+     * @since 1.1.0
+     */
+    public static synchronized void registerEconomy(@NotNull EasyconomyEcoAPI eco) {
         if (instance.economy != null) {
+            instance.getLogger().warn("Replacing the old economy of " + instance.economy.getClass().getSimpleName()
+                    + " with the new economy of " + eco.getClass().getSimpleName() + ".");
             instance.saveAll();
             instance.toSave.remove(instance.economy.getBankStorage());
             instance.toSave.remove(instance.economy.getPlayerDataStorage());

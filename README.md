@@ -37,7 +37,8 @@ The main policy of the plugin is that it only includes core economy features.
    - 1.16.4 or above
    - The [Vault Plugin](https://dev.bukkit.org/projects/vault) implementing vault-api 1.7 or beyond
 * Minestom
-   - A more recent version
+   - Minestom API ddf8cc383d or later
+   - A persistent-UUID capable server implementation
 * Java
    - 11 or higher. This is meant to be used for serious production use, if you are still running Java 8 you are out of luck
 
