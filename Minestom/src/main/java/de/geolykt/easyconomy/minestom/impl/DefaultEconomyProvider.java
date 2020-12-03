@@ -28,7 +28,7 @@ public class DefaultEconomyProvider implements EasyconomyEcoAPI {
     public DefaultEconomyProvider(@NotNull EasyconomyAdvanced extension,
             @NotNull PlayerDataStorage playerStorageEngine,
             @NotNull BankStorageEngine bankStorageEngine) {
-        currencyFormat = "$%.2f";
+        currencyFormat = extension.getConfig().getEcoFormat();
         playerPDS = playerStorageEngine;
         bankPDS = bankStorageEngine;
     }

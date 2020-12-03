@@ -17,16 +17,21 @@ public class GivemoneyCommand extends Command {
     private final EasyconomyAdvanced extension;
     private final BasicPermission perm;
 
+    private final String unpermitted;
+    private final String playerNotFound;
+
    public GivemoneyCommand(EasyconomyAdvanced invokingExtension,BasicPermission permission) {
         super("givemoney", "givebal", "addmoney", "addbal");
         extension = invokingExtension;
         perm = permission;
+        unpermitted = extension.getConfig().getNotPermitted();
+        playerNotFound = extension.getConfig().getNotAPlayer();
         addSyntax(this::handleCommand, ArgumentType.Word("target"), ArgumentType.Double("amount"));
     }
 
     public void handleCommand(CommandSender sender, Arguments args) {
         if (!sender.hasPermission(perm) && !sender.isConsole()) {
-            sender.sendMessage(ChatColor.DARK_RED + "You are not permitted to use this command.");
+            sender.sendMessage(unpermitted);
             return;
         }
         String target = args.getWord("target");
@@ -37,8 +42,7 @@ public class GivemoneyCommand extends Command {
             // Give money to player
             Player player = MinecraftServer.getConnectionManager().getPlayer(target);
             if (player == null || !extension.getEconomy().isPlayerExisting(player.getUuid())) {
-                sender.sendMessage(ChatColor.RED + "The player " + ChatColor.CYAN + target
-                        + ChatColor.RED + " could not be found.");
+                sender.sendMessage(playerNotFound);
                 return;
             }
             double now = extension.getEconomy().givePlayerMoney(player.getUuid(), money);

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.configurate.ConfigurateException;
 
 import de.geolykt.easyconomy.api.BankStorageEngine;
 import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
@@ -28,6 +29,7 @@ public class EasyconomyAdvanced extends Extension {
     private final Set<Saveable> toSave = new HashSet<Saveable>();
     private static EasyconomyAdvanced instance;
     private EasyconomyEcoAPI economy;
+    private EasyconomyConfiguration config;
 
     private void saveAll() {
         Set<Saveable> erroringSaveables = new HashSet<>();
@@ -57,10 +59,15 @@ public class EasyconomyAdvanced extends Extension {
 
     @Override
     public void initialize() {
+        File parent = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "easyconomy");
+        parent.mkdir();
+        try {
+            config = new EasyconomyConfiguration(new File(parent, "config.conf"));
+        } catch (ConfigurateException e) {
+            throw new RuntimeException(e);
+        }
         if (economy == null) {
             // FIXME Minestom makes use of StorageManager, we should too!
-            File parent = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "easyconomy");
-            parent.mkdir();
             PlayerDataStorage pds = new PlayerDataEngine(new File(parent, "players.dat"));
             BankStorageEngine bds = new BankDataEngine(new File(parent, "banks.dat"));
             registerEconomy(new DefaultEconomyProvider(this, pds, bds));
@@ -122,4 +129,8 @@ public class EasyconomyAdvanced extends Extension {
 
     @Override
     public void terminate() {}
+
+    public EasyconomyConfiguration getConfig() {
+        return config;
+    }
 }
