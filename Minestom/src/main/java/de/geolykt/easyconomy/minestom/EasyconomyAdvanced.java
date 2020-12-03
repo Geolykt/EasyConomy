@@ -13,6 +13,7 @@ import de.geolykt.easyconomy.api.PlayerDataStorage;
 import de.geolykt.easyconomy.api.Saveable;
 import de.geolykt.easyconomy.minestom.commands.AdministratorPermissions;
 import de.geolykt.easyconomy.minestom.commands.BalanceCommand;
+import de.geolykt.easyconomy.minestom.commands.BaltopCommand;
 import de.geolykt.easyconomy.minestom.commands.GivemoneyCommand;
 import de.geolykt.easyconomy.minestom.impl.BankDataEngine;
 import de.geolykt.easyconomy.minestom.impl.DefaultEconomyProvider;
@@ -63,14 +64,14 @@ public class EasyconomyAdvanced extends Extension {
             BankStorageEngine bds = new BankDataEngine(new File(parent, "banks.dat"));
             registerEconomy(new DefaultEconomyProvider(this, pds, bds));
         }
-        // TODO provide commands
         MinecraftServer.getSchedulerManager().buildTask(this::saveAll)
             .repeat(10, TimeUnit.MINUTE)
             .delay(10, TimeUnit.MINUTE).schedule();
-        MinecraftServer.getSchedulerManager().buildShutdownTask(this::saveAll).schedule();
         MinecraftServer.getConnectionManager()
                 .addPlayerInitialization((Player p) -> getEconomy().createPlayer(p.getUuid()));
         MinecraftServer.getCommandManager().register(new BalanceCommand(this));
+        MinecraftServer.getCommandManager().register(new BaltopCommand(this));
+        // FIXME correct permissions for the commands below
         MinecraftServer.getCommandManager().register(new GivemoneyCommand(this, new AdministratorPermissions()));
     }
 
@@ -82,9 +83,11 @@ public class EasyconomyAdvanced extends Extension {
 
     @Override
     public void preTerminate() {
-        getLogger().info("Saving easyconomy saveables...");
+        getLogger().info("Preparing shutdown...");
         this.saveAll();
         toSave.clear();
+        economy = null;
+        instance = null;
     }
 
     public void addSaveable(@NotNull Saveable saveable) {
@@ -107,7 +110,5 @@ public class EasyconomyAdvanced extends Extension {
     }
 
     @Override
-    public void terminate() {
-        // TODO
-    }
+    public void terminate() {}
 }

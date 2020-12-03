@@ -27,6 +27,7 @@ public class GivemoneyCommand extends Command {
     public void handleCommand(CommandSender sender, Arguments args) {
         if (!sender.hasPermission(perm) && !sender.isConsole()) {
             sender.sendMessage(ChatColor.DARK_RED + "You are not permitted to use this command.");
+            return;
         }
         String target = args.getWord("target");
         double money = args.getDouble("amount");
