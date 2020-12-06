@@ -1,10 +1,10 @@
 general:
   insufficientFunds: "&cInsufficient funds! You need an additional &e%s &cto afford this payment!"
-  notAnumber: "&e%s &cis not a number or larger/smaller than about 2 billions! Please supply a number like 10 or 15.22"
+  notAnumber: "&e%s &cis not a number or larger/smaller than about 2 billion! Please supply a number like 10 or 15.22"
   syntax: "&cSyntax: &e%s"
   noPerms: "&cMissing permission: &e%s"
   playerOnly: "&cThis command can only be used as a player."
-  noAccount: "&e%s &chas never joined the server!"
+  noAccount: "&e%s &chas never joined the server or isn't a player at all!"
 
 balance:
   ofOther: "Balance of &6%s&7: &6%s"
@@ -12,21 +12,21 @@ balance:
 
 eco:
   helpMessage: "Available commands: &a/eco, /eco backup, /eco give|take|set <player> <amount>, /bal [player], /pay <player> <amount>, /baltop"
-  success: "You changed the balance of %s by %s. He now has %s"
+  success: "You changed the balance of %s by %s. The balance is now at %s"
 
 pay:
-  you: "You paid &6%s %s&7. You know have &6%s&7."
-  target: "&6%s &7paid you&6 %s&7. You know have &6%s&7."
+  you: "You paid &6%s %s&7. You now have &6%s&7."
+  target: "&6%s &7paid you&6 %s&7. You now have &6%s&7."
   self: "&cYou can't pay yourself!"
   amountTooSmall: "&cThe amount is too small! You must pay at least &e%s&c!"
 
 baltop:
   start: "&aPlayers with the highest balances:"
   value: "&7[&a%s&7] &b%s"
-  none: "&7There are no balances to show here or this command was disabled in the config."
+  none: "&7There are no balances to show here or this command was disabled in the configuration."
 
 backup:
   start: "&7Creating backup, please wait"
-  ioissue: "&c An IO Exception occoured while performing a backup, you may want to try it again later."
+  ioissue: "&cAn IO Exception occoured while performing the backup, you may want to try it again later."
   finished: "&aFinished creating backup!"
   timeout: "&cThe backup postprocess command took too long and was terminated."

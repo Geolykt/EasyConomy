@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>ddf8cc383d</version>
+            <version>43aca45c05</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>ddf8cc383d</version>
+            <version>43aca45c05</version>
             <scope>provided</scope>
             <type>javadoc</type>
         </dependency>

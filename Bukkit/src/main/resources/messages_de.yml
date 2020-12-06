@@ -1,6 +1,6 @@
 general:
   insufficientFunds: "&cDir fehlen &e%s&c, um das zu bezahlen!"
-  notAnumber: "&e%s &cist keine Zahl oder zu groß/zu klein. &7Denk dran, Kommas als Punkt zu schreiben!"
+  notAnumber: "&e%s &cist keine Zahl oder zu groß/zu klein. &7Denk dran, das Komma als Punkt zu schreiben!"
   syntax: "&cSyntax: &e%s"
   noPerms: "&cFehlende Rechte: &e%s"
   playerOnly: "&cDieser Befehl ist nur für Spieler."
@@ -12,10 +12,10 @@ balance:
 
 eco:
   helpMessage: "Befehle: &a/eco, /eco backup, /eco give|take|set <player> <amount>, /bal [player], /pay <player> <amount>, /baltop"
-  success: "Du hast den Kontostand von %s um %s verändert. Er hat nun %s"
+  success: "Du hast den Kontostand von %s um %s verändert. Der Kontostand liegt nun bei %s"
 
 pay:
-  you: "Du hast &6%s %s&7 bezahlt.. Du hast nun &6%s&7."
+  you: "Du hast &6%s %s&7 bezahlt. Du hast nun &6%s&7."
   target: "&6%s &7hat dir&6 %s&7 bezahlt. Du hast nun &6%s&7."
   self: "&cDu kannst dir nicht selbst Geld überweisen!"
   amountTooSmall: "&cDer Betrag ist zu klein! Du musst mindestends &e%s &cüberweisen!"
@@ -29,4 +29,4 @@ backup:
   start: "&7Erstelle backup..."
   ioissue: "&c Ein IO-Fehler ist beim Erstellen des Backups aufgetreten, versuchen Sie es später noch einmal."
   finished: "&aBackup fertig erstellt!"
-  timeout: "&cDer Backup braucht zu viel zeit um fertiggestellt zu werden und wurde terminiert."
+  timeout: "&cDer Backup brauchte zu viel Zeit um fertiggestellt zu werden und wurde terminiert."
