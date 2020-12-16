@@ -1,6 +1,9 @@
 package de.geolykt.easyconomy.minestom;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -22,6 +25,19 @@ public class EasyconomyConfiguration {
     private final CommentedConfigurationNode config;
 
     public EasyconomyConfiguration(File configfile) throws RuntimeException {
+        if (!configfile.exists()) {
+            try {
+                configfile.createNewFile();
+                InputStream defaultConf = getClass().getResourceAsStream("/config.conf");
+                FileOutputStream fio = new FileOutputStream(configfile);
+                defaultConf.transferTo(fio);
+                fio.flush();
+                fio.close();
+                defaultConf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             config =  HoconConfigurationLoader.builder().file(configfile).build().load();
         } catch (ConfigurateException e) {
