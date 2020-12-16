@@ -7,9 +7,6 @@
     "repositories": [
       {"name": "Central", "url": "https://repo1.maven.org/maven2/"}
     ],
-    "artifacts": [
-      "com.typesafe:config:jar:1.4.1",
-      "org.spongepowered:configurate-hocon:4.0.0"
-    ]
+    "artifacts": []
   }
 }

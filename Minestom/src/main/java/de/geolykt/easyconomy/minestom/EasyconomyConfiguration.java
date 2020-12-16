@@ -2,6 +2,7 @@ package de.geolykt.easyconomy.minestom;
 
 import java.io.File;
 
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -20,8 +21,12 @@ public class EasyconomyConfiguration {
 
     private final CommentedConfigurationNode config;
 
-    public EasyconomyConfiguration(File configfile) throws ConfigurateException {
-        config =  HoconConfigurationLoader.builder().file(configfile).build().load();
+    public EasyconomyConfiguration(File configfile) throws RuntimeException {
+        try {
+            config =  HoconConfigurationLoader.builder().file(configfile).build().load();
+        } catch (ConfigurateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getEcoFormat() {
@@ -36,33 +41,37 @@ public class EasyconomyConfiguration {
         return config.node("baltop-page-size").getInt(25);
     }
 
-    public String getBaltopHeader() {
+    public @NotNull String getBaltopHeader() {
         return config.node("baltop-header").getString(ChatColor.DARK_GREEN + "Here are the %d richest players:");
     }
 
-    public String getBaltopEntry() {
+    public @NotNull String getBaltopEntry() {
         return config.node("baltop-entry").getString(ChatColor.DARK_GREEN + "  %02d.: " +  ChatColor.BRIGHT_GREEN + "%s - %s");
     }
 
-    public String getSelfBalance() {
+    public @NotNull String getSelfBalance() {
         return config.node("balance-self").getString(ChatColor.BRIGHT_GREEN + "Your balance: " + ChatColor.CYAN + "%s");
     }
 
-    public String getOthersBalance() {
+    public @NotNull String getOthersBalance() {
         return config.node("balance-other").getString(ChatColor.BRIGHT_GREEN + "Balance of " 
                 + ChatColor.DARK_GREEN + "%s" + ChatColor.BRIGHT_GREEN + " is " 
                 + ChatColor.CYAN + "%s" + ChatColor.BRIGHT_GREEN + ".");
     }
 
-    public String getNotAPlayer() {
+    public @NotNull String getNotAPlayer() {
         return config.node("error-not-a-player").getString(ChatColor.RED + "Only players can execute this command.");
     }
 
-    public String getInvalidPlayer() {
+    public @NotNull String getInvalidPlayer() {
         return config.node("error-invalid-player").getString(ChatColor.RED + "You did not specify a valid player.");
     }
 
-    public String getNotPermitted() {
+    public @NotNull String getNotPermitted() {
         return config.node("error-unpermitted").getString(ChatColor.DARK_RED + "You are not permitted to use this command.");
+    }
+
+    public @NotNull String getAdminPermission() {
+        return config.node("permission-admin").getString("easyconomy.admin");
     }
 }

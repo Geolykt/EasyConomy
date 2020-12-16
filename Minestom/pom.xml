@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>43aca45c05</version>
+            <version>ed46bd0dc2</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
@@ -44,21 +44,13 @@
                     <artifactId>shrinkwrap-resolver-depchain</artifactId>
                 </exclusion>
             </exclusions>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Minestom</groupId>
-            <artifactId>Minestom</artifactId>
-            <version>43aca45c05</version>
-            <scope>provided</scope>
-            <type>javadoc</type>
         </dependency>
         <!-- ... The configuration parser (for HOCON) ... -->
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-hocon</artifactId>
             <version>4.0.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <!-- ... and lastly our own API -->
         <dependency>
@@ -81,6 +73,26 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <relocations>
+                                <!-- SpongePowered bricks the Minestom ClassLoader -->
+                                <relocation>
+                                    <pattern>org.spongepowered</pattern>
+                                    <shadedPattern>org.borkpowered</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <!-- And these brick Java -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

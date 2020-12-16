@@ -9,9 +9,9 @@ It is a standalone application and currently does not need any other extension a
  * Provides `/baltop` and `/bal` as commands.
 
 ## Dependencies / Requirements
- * Java 11 or above (duh)
+ * Java 11 or above (which you'd need anyways)
  * A Minestom server
-   - Implementing Minestom API ddf8cc383d or later
+   - Implementing Minestom API ed46bd0dc2 or later
    - UUIDs HAVE to be consistent with in the implementation in order for saving to work properly.
  * No further dependencies outside of those provided by the extension.json
 

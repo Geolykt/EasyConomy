@@ -6,13 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.configurate.ConfigurateException;
 
 import de.geolykt.easyconomy.api.BankStorageEngine;
 import de.geolykt.easyconomy.api.EasyconomyEcoAPI;
 import de.geolykt.easyconomy.api.PlayerDataStorage;
 import de.geolykt.easyconomy.api.Saveable;
-import de.geolykt.easyconomy.minestom.commands.AdministratorPermissions;
 import de.geolykt.easyconomy.minestom.commands.BalanceCommand;
 import de.geolykt.easyconomy.minestom.commands.BaltopCommand;
 import de.geolykt.easyconomy.minestom.commands.GivemoneyCommand;
@@ -51,7 +49,7 @@ public class EasyconomyAdvanced extends Extension {
     @Override
     public void preInitialize() {
         if (instance != null) {
-            throw new RuntimeException();
+            throw new IllegalStateException("There's already an extension instance running!");
         }
         instance = this;
         // TODO provide service
@@ -61,11 +59,7 @@ public class EasyconomyAdvanced extends Extension {
     public void initialize() {
         File parent = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "easyconomy");
         parent.mkdir();
-        try {
-            config = new EasyconomyConfiguration(new File(parent, "config.conf"));
-        } catch (ConfigurateException e) {
-            throw new RuntimeException(e);
-        }
+        config = new EasyconomyConfiguration(new File(parent, "config.conf"));
         if (economy == null) {
             // FIXME Minestom makes use of StorageManager, we should too!
             PlayerDataStorage pds = new PlayerDataEngine(new File(parent, "players.dat"));
@@ -80,7 +74,7 @@ public class EasyconomyAdvanced extends Extension {
         MinecraftServer.getCommandManager().register(new BalanceCommand(this));
         MinecraftServer.getCommandManager().register(new BaltopCommand(this));
         // FIXME correct permissions for the commands below - they could be better
-        MinecraftServer.getCommandManager().register(new GivemoneyCommand(this, new AdministratorPermissions()));
+        MinecraftServer.getCommandManager().register(new GivemoneyCommand(this));
     }
 
     @Override

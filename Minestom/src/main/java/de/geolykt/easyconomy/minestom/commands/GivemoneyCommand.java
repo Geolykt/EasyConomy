@@ -9,21 +9,20 @@ import net.minestom.server.command.builder.Arguments;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.Player;
-import net.minestom.server.permission.BasicPermission;
 
 @SuppressWarnings("static-access")
 public class GivemoneyCommand extends Command {
 
     private final EasyconomyAdvanced extension;
-    private final BasicPermission perm;
+    private final String perm;
 
     private final String unpermitted;
     private final String playerNotFound;
 
-   public GivemoneyCommand(EasyconomyAdvanced invokingExtension,BasicPermission permission) {
+   public GivemoneyCommand(EasyconomyAdvanced invokingExtension) {
         super("givemoney", "givebal", "addmoney", "addbal");
         extension = invokingExtension;
-        perm = permission;
+        perm = extension.getConfig().getAdminPermission();
         unpermitted = extension.getConfig().getNotPermitted();
         playerNotFound = extension.getConfig().getNotAPlayer();
         addSyntax(this::handleCommand, ArgumentType.Word("target"), ArgumentType.Double("amount"));
