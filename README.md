@@ -43,7 +43,7 @@ The main policy of the plugin is that it only includes core economy features.
    - 11 or higher. This is meant to be used for serious production use, if you are still running Java 8 you are out of luck
 
 ## Support
-There currently is no particular discord support server, however feel free to DM me at `tristellar#9022` via discord.
+There is currently no way to contact me outside of github issues or github discussions, however feel free to talk to me if you find me on other parts of the net.
 
 ## Compiling
 The project can be easily compiled using `mvn install` at the project root, however your IDE might automise that. Additionally if you only need to make use of the bukkit implementation you can remove the Minestom folder and vice-versa
