@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Weiiswurst
+ * @author Weiiswurst, Geolykt
  */
 public class MessageTranslator {
 
@@ -60,8 +60,8 @@ public class MessageTranslator {
         String filename = "messages_" + language + ".yml";
         File languageFile = new File(invokingPlugin.getDataFolder(), filename);
         if(!languageFile.exists()) {
-            plugin.getLogger().severe("!!! The language chosen by you, "+language+", cannot be resolved!");
-            plugin.getLogger().severe("!!! Create a file called messages_"+language+".yml in the EasyConomy folder to start!");
+            plugin.getLogger().severe("!!! The language chosen by you, " + language + ", cannot be resolved!");
+            plugin.getLogger().severe("!!! Create a file called messages_" + language + ".yml in the EasyConomy folder to start!");
             plugin.getLogger().severe("!!! For now, the ENGLISH language file will be loaded!");
             languageFile = new File(invokingPlugin.getDataFolder(), "messages_en.yml");
         }
@@ -74,6 +74,7 @@ public class MessageTranslator {
     }
 
     // Loading custom language files for add-ons
+    @Deprecated(forRemoval = true, since = "1.2.0")
     public void loadMessageFile(@NotNull String path) {
         File languageFile = new File(path);
         if(!languageFile.exists()) {
@@ -90,8 +91,11 @@ public class MessageTranslator {
 
     private void saveDefaults() {
         for(String translation : TRANSLATIONS) {
-            plugin.saveResource("messages_"+translation+".yml", true);
-            plugin.getLogger().info("Default language exported: messages_"+translation+".yml");
+            String filename = "messages_" + translation + ".yml";
+            if (new File(plugin.getDataFolder(), filename).exists()) {
+                plugin.saveResource(filename, true);
+                plugin.getLogger().info("Default language exported: messages_"+translation+".yml");
+            }
         }
     }
 

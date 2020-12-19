@@ -113,7 +113,7 @@ public final class Easyconomy extends JavaPlugin {
             Bukkit.getServicesManager().register(Economy.class, (Economy) ecp, this, ServicePriority.Normal);
         } else {
             getLogger().severe("!!! YOU ALREADY HAVE AN ECONOMY PLUGIN !!!");
-            getLogger().severe(String.format("!!! REMOVE OR DISABLE THE ECONOMY OF %s !!!",rsp.getProvider().getName()));
+            getLogger().severe(String.format("!!! REMOVE OR DISABLE THE ECONOMY OF %s !!!", rsp.getProvider().getName()));
             pm.disablePlugin(this);
             return;
         }
@@ -123,7 +123,7 @@ public final class Easyconomy extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("EasyConomyAdvanced is a fork that is maintained by Geolykt. "
-                + "Do not bother Weiiswurst about any help for this and ask tristellar#9022 / Geolykt instead.");
+                + "Do not bother Weiiswurst about any help for this and ask Geolykt instead.");
         if (!isLoaded) {
             return;
         }
