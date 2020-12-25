@@ -92,7 +92,7 @@ public class MessageTranslator {
     private void saveDefaults() {
         for(String translation : TRANSLATIONS) {
             String filename = "messages_" + translation + ".yml";
-            if (new File(plugin.getDataFolder(), filename).exists()) {
+            if (!new File(plugin.getDataFolder(), filename).exists()) {
                 plugin.saveResource(filename, true);
                 plugin.getLogger().info("Default language exported: messages_"+translation+".yml");
             }
