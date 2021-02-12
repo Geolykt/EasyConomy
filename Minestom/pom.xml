@@ -35,13 +35,18 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>ed46bd0dc2</version>
+            <version>427632d29b</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.shrinkwrap.resolver</groupId>
                     <artifactId>shrinkwrap-resolver-depchain</artifactId>
+                </exclusion>
+                <!-- Something that ages ages to download -->
+                <exclusion>
+                    <groupId>org.rocksdb</groupId>
+                    <artifactId>rocksdbjni</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
