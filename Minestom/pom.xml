@@ -28,6 +28,10 @@
             <id>authlib-repo</id>
             <url>https://libraries.minecraft.net</url>
         </repository>
+        <repository>
+            <id>velocity-repo</id>
+            <url>https://repo.velocitypowered.com/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -35,7 +39,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>427632d29b</version>
+            <version>80d0b8def6</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
@@ -47,6 +51,11 @@
                 <exclusion>
                     <groupId>org.rocksdb</groupId>
                     <artifactId>rocksdbjni</artifactId>
+                </exclusion>
+                <!-- Something that also bricks maven -->
+                <exclusion>
+                    <groupId>net.minestom</groupId>
+                    <artifactId>minestom-data-full</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -24,7 +24,7 @@ import net.minestom.server.utils.time.TimeUnit;
 
 public class EasyconomyAdvanced extends Extension {
 
-    private final Set<Saveable> toSave = new HashSet<Saveable>();
+    private final Set<Saveable> toSave = new HashSet<>();
     private static EasyconomyAdvanced instance;
     private EasyconomyEcoAPI economy;
     private EasyconomyConfiguration config;
@@ -118,7 +118,11 @@ public class EasyconomyAdvanced extends Extension {
     }
 
     public static @NotNull EasyconomyEcoAPI getEconomy() {
-        return instance.economy;
+        EasyconomyEcoAPI eco = instance.economy;
+        if (eco == null) {
+            throw new IllegalStateException("The economy is not yet defined!");
+        }
+        return eco;
     }
 
     @Override

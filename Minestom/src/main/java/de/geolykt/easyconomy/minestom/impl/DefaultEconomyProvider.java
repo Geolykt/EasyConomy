@@ -20,8 +20,8 @@ import de.geolykt.easyconomy.minestom.EasyconomyAdvanced;
  */
 public class DefaultEconomyProvider implements EasyconomyEcoAPI {
 
-    private final BankStorageEngine bankPDS;
-    private final PlayerDataStorage playerPDS;
+    private final @NotNull BankStorageEngine bankPDS;
+    private final @NotNull PlayerDataStorage playerPDS;
 
     private final String currencyFormat;
 
@@ -53,7 +53,11 @@ public class DefaultEconomyProvider implements EasyconomyEcoAPI {
 
     @Override
     public @NotNull String format(double amount) {
-        return String.format(currencyFormat, amount);
+        String message = String.format(currencyFormat, amount);
+        if (message == null) {
+            throw new InternalError("The JVM has an issue.");
+        }
+        return message;
     }
 
     @Override

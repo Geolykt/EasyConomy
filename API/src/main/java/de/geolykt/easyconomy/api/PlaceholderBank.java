@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class PlaceholderBank implements Bank {
 
     protected double money;
-    protected final String name;
+    protected final @NotNull String name;
 
     public PlaceholderBank(@NotNull String bankName, double balance) {
         money = balance;

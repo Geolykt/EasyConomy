@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import de.geolykt.easyconomy.api.PlaceholderBank;
 public class BankDataEngine implements BankStorageEngine {
 
     private final File loc;
-    private final HashMap<String, Bank> banks = new HashMap<>();
+    private final @NotNull HashMap<String, Bank> banks = new HashMap<>();
     
     public BankDataEngine(File storageFile) {
         loc = storageFile;
@@ -76,9 +77,7 @@ public class BankDataEngine implements BankStorageEngine {
             banks.clear();
             while (buff.hasRemaining()) {
                 Bank bank = deserialize(buff);
-                if (bank != null) {
-                    banks.put(bank.getName(), bank);
-                }
+                banks.put(bank.getName(), bank);
             }
         }
     }
@@ -93,7 +92,12 @@ public class BankDataEngine implements BankStorageEngine {
 
     @Override
     public @NotNull Set<String> getBanks() {
-        return banks.keySet();
+        Set<String> keyset = banks.keySet();
+        if (keyset == null) {
+            // Unlikely that this would happen
+            return new HashSet<>();
+        }
+        return keyset;
     }
 
     @Override

@@ -30,11 +30,11 @@ import de.geolykt.easyconomy.api.PlayerDataStorage;
 public class PlayerDataEngine implements PlayerDataStorage {
 
     private final HashMap<UUID, Double> data = new HashMap<>();
-    private LinkedHashMap<UUID, Double> baltop;
+    private @NotNull LinkedHashMap<UUID, Double> baltop = new LinkedHashMap<>();
 
-    private final File storageLocation;
+    private final @NotNull File storageLocation;
 
-    public PlayerDataEngine(File storingFile) {
+    public PlayerDataEngine(@NotNull File storingFile) {
         storageLocation = storingFile;
         storingFile.getParentFile().mkdirs();
         reload();
@@ -81,7 +81,11 @@ public class PlayerDataEngine implements PlayerDataStorage {
 
     @Override
     public @NotNull List<UUID> getAllKeys() {
-        return Arrays.asList((UUID[]) data.keySet().toArray());
+        List<UUID> uids = Arrays.asList(data.keySet().toArray(new UUID[0]));
+        if (uids == null) {
+            throw new InternalError("JVM is broken");
+        }
+        return uids;
     }
 
     @Override
@@ -143,6 +147,7 @@ public class PlayerDataEngine implements PlayerDataStorage {
         return storageLocation;
     }
 
+    @SuppressWarnings("null")
     public void reloadBaltop() {
         baltop = data.entrySet().stream()
                 .dropWhile((entry) -> entry.getValue() < 0.0) // Remove inactive accounts - this eases sorting a bit further
